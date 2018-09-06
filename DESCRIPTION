@@ -1,0 +1,27 @@
+Package: phaseI
+Type: Package
+Title: Clinical Trials Phase I (Title Case)
+Version: 0.1.0
+Author: Jun Yin, Lu Zhang
+Maintainer: Lu Zhang <luzhangstat@gmail.com>
+Description: More about what it does (maybe more than one line)
+    Use four spaces when indenting paragraphs within the Description.
+SystemRequirements: JAGS(http://mcmc-jags.sourceforge.net)
+Depends: 
+    R (>= 3.5.0),
+    coda
+Encoding: UTF-8
+LazyData: true
+Imports:
+    arrayhelpers,
+    phase1RMD,
+    rjags (>= 4.1.0),
+    R2WinBUGS,
+    stats
+RoxygenNote: 6.1.0
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat
+VignetteBuilder: knitr
+License: GPL (>= 2)

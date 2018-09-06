@@ -1,0 +1,22 @@
+model
+{
+    beta <- c(beta_other[], beta_dose)
+    for (i in 1:N1) {
+        y[i] ~ dnorm(mu[i], tau_e)
+        mu[i] <- inprod(X_y[i, ], beta) + inprod(W_y[i, ], gamma)
+    }
+    for (j in 1:N2) {
+        gamma[j] ~ dnorm(0.00000E+00, tau_g)
+    }
+    for (k in 1:N3) {
+        y_e[k] ~ dnorm(mu_e[k], tau_f)
+        mu_e[k] <- inprod(X_e[k, ], alpha) + rho * gamma[keepeff.ind[k]]
+    }
+    beta_other ~ dmnorm(p1_beta_other[], p2_beta_other[, ])
+    beta_dose ~ dunif(p1_beta_dose, p2_beta_dose)
+    alpha ~ dmnorm(p1_alpha[], p2_alpha[, ])
+    rho ~ dnorm(p1_rho, p2_rho)
+    tau_e ~ dunif(p1_tau_e, p2_tau_e)
+    tau_g ~ dunif(p1_tau_g, p2_tau_g)
+    tau_f ~ dunif(p1_tau_f, p2_tau_f)
+}
