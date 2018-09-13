@@ -1,8 +1,8 @@
 #' Toxicity probability matrix
 #'
 #' A 6 dimension array providing the toxicity probability.
-#' The dimension of the toxicity probability matrix is 4 3 3 6 6 5 which
-#' represents scenario, cycle effect, tox type, cycle number, dose level
+#' The dimension of the toxicity probability matrix is 4 3 6 6 3 5 which
+#' represents scenario, cycle effect, dose level, cycle number, tox type,
 #' and tox grade. Scenarios are order in a way that first scenario is MTD = dose 2,
 #' and second is MTD = dose 3, and third is MTD = dose 4, and fourth
 #' is MTD = dose level 5. Cycle effect is ordered from decreasing toxicity
@@ -14,7 +14,7 @@
 
 #' Efficacy response generation parameters
 #'
-#' A list of 3 for the parameters in the efficacy response generation
+#' A list of 4 for the parameters in the efficacy response generation
 #'
 #' @return
 #' \item{Dose_Cycle_Meff}{Dose-cycle mean efficacy matrix. A 4 dimension array

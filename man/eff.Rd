@@ -29,6 +29,6 @@ dose and cycle. Patterns are ordered from increasing, flat, platform decreasing
 and quadratic efficacy across dose levels and cycles.}
 }
 \description{
-A list of 3 for the parameters in the efficacy response generation
+A list of 4 for the parameters in the efficacy response generation
 }
 \keyword{datasets}

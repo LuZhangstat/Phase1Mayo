@@ -1,3 +1,7 @@
+################################################################################
+########################  Function in senerio summary  #########################
+################################################################################
+
 
 pDLT <- function(proba, wm){
 
@@ -198,18 +202,6 @@ phase1stage1 <- function(patlist, ctrl_param, n.iters = 5000, burn.in = 5000,
 
   inits.list <- modifyList(inits.list, inits.list.set)
 
-  # # need r2jags
-  # t <- proc.time()
-  #  jagsobj <- jags.parallel(model.file = path.model,
-  #                               data = mydata,
-  #                               n.chains = n.chains,
-  #                           n.iter = 10000,
-  #                           n.burnin = 5000, n.thin = 2,
-  #                               inits = NULL,
-  #                           parameters.to.save = retrieve_param)
-  #  post.samples <- jagsobj$BUGSoutput$sims.list
-  # proc.time() - t
-
   jagsobj <- rjags::jags.model(path.model,
                                data = mydata,
                                n.chains = n.chains,
@@ -335,38 +327,24 @@ phase1stage2 <- function(patlist, ctrl_param, n.iters = 5000, burn.in = 5000,
   }
 
   inits.list <- modifyList(inits.list, inits.list.set)
-  #  t <- proc.time()
   jagsobj <- rjags::jags.model(path.model,
                                data = mydata,
                                n.chains = n.chains,
                                quiet = TRUE,
                                inits = inits.list)
 
-  # need r2jags
-  #t <- proc.time()
-  #  jagsobj <- jags.parallel(model.file = path.model,
-  #                               data = mydata,
-  #                               n.chains = 2,
-  #                           n.iter = 10000, n.burnin = 5000,
-  #                               inits = NULL,
-  #                           parameters.to.save =
-  #                             c("beta_dose", "beta_other", "alpha", "gamma"))
-  #proc.time() - t
-
   update(jagsobj, n.iter = burn.in, progress.bar = "none")
   post.samples <- rjags::jags.samples(jagsobj, retrieve_param,
                                       n.iter = n.iters, thin = 2,
                                       progress.bar = "none")
-  #  print(plot(post.samples$beta_dose[, , 1], type = "l"))
   return(post.samples)
-
 }
 
 
 
-# ################################################################################
-# ####################### Function in dose recommendation  #######################
-# ################################################################################
+################################################################################
+####################### Function in dose recommendation  #######################
+################################################################################
 gen.prob.dos.cyc <- function(sim.betas, doses, cycles, thrd){
 
   ## Calculate the posterior probability of having safe toxicity for given
@@ -419,7 +397,7 @@ stg1.safe.dos <- function(post_samples, doses, cycles, thrd1, thrd2,
 
 stg1.dos.rec.i <- function(post_samples, uniq_ID, patID_act,
                            cycle_act, rec_dose_act, Max_tested_doseA,
-                           doses, c1, p1, DLT.drop.flag = F, y.dlt = NULL,
+                           doses, cycles, c1, p1, DLT.drop.flag = F, y.dlt = NULL,
                            testedD = T){
 
   ## Calculate the posterior probability of having safe toxicity for each patients
@@ -433,6 +411,7 @@ stg1.dos.rec.i <- function(post_samples, uniq_ID, patID_act,
   ## rec_dose_act:  current recommend dose for current cycle
   ## Max_tested_doseA:      Maximum tested dose level in cycle1
   ## doses:         dose levels in the study
+  ## cycles:        cycles in the treatment
   ## DLT.drop.flag: whether drop off when DLT observed
   ## y.dlt:         the DLT results, required when DLT.drop.flag = T
   ## c1:            target toxicity
@@ -451,16 +430,15 @@ stg1.dos.rec.i <- function(post_samples, uniq_ID, patID_act,
       cat("y.dlt is not specified when DLT.drop.flag = T ")
       return
     }else{
-      nxt.index <- which(cycle_nxt <= 6 & y.dlt == 0)
+      nxt.index <- which(cycle_nxt <= max(cycles) & y.dlt == 0)
     }
   } else {
-    nxt.index <- which(cycle_nxt <= 6)
+    nxt.index <- which(cycle_nxt <= max(cycles))
   }
   cycle_nxt <- cycle_nxt[nxt.index]
   patID_nxt <- patID_act[nxt.index]
 
   if(length(cycle_nxt) == 0){
-    cat("\n no patients need to recommend dose for the next cycle")
     return(list(patID_nxt = NULL, cycle_nxt = NULL, rec_dose_nxt = NULL,
                 ICD_nxt = NULL))}
 
@@ -489,7 +467,7 @@ stg1.dos.rec.i <- function(post_samples, uniq_ID, patID_act,
 
   if(testedD == T){
     ## don't escalcate dose to untested dose level ##
-    rec_dose_nxt[which(rec_dose_nxt > Max_tested_doseA)] <- Max_tested_doseA  #to compare the resurts
+    rec_dose_nxt[which(rec_dose_nxt > Max_tested_doseA)] <- Max_tested_doseA
   }
   ## don't skip dose level ##
   skip.index <- which((rec_dose_nxt - rec_dose_act[nxt.index]) > 1)
@@ -587,6 +565,35 @@ stg1.dos.rec <- function(post_samples, doses, tox.target, Max_tested_doseA){
   return(doseA)
 }
 
+stg3.dos.rec <- function(post_samples, doses, tox.target, Max_tested_doseA){
+
+  ## dose recommendation for next cohort for stage 1 ##
+  ## doses
+  ## tox.target = 0.28
+  ## Max_tested_doseA: the maximum previously tried dose for cycle1
+
+  sim.betas <- as.matrix(rbind(post_samples$beta_other[1, , 1],
+                               post_samples$beta_dose[, , 1],
+                               post_samples$beta_other[2, , 1]))
+
+  loss.doses <- sapply(doses, function(d) {
+    mean(apply(sim.betas, 2, function(b) {
+      abs(b[1] + b[2] * d + b[3] - tox.target)
+    }))
+  })
+
+  nxtdose <- doses[which.min(loss.doses)]
+
+  # Don't recommend dose levels not tested in cycle 1 in stage 3
+  if (as.numeric(nxtdose) > Max_tested_doseA ) {
+    doseA <- Max_tested_doseA
+  } else {
+    doseA <- as.numeric(nxtdose)
+  }
+
+  return(doseA)
+}
+
 stg2.eff.rec <- function(post_samples, allow.doses, Max_tested_doseA,
                          proxy.thrd){
 
@@ -609,7 +616,7 @@ stg2.eff.rec <- function(post_samples, allow.doses, Max_tested_doseA,
   #  RAND.EFF <- exp(RAND.EFF) / sum(exp(RAND.EFF))
   #  nxtdose <- sample(allow.doses, 1, prob = RAND.EFF)
 
-  ## No long assign the next cohort through sampling
+  ## next dose is the lowest dose (among allow dose set) that is efficacious
   nxtdose <- allow.doses[which(RAND.EFF >= max(RAND.EFF) - proxy.thrd)[1]]
 
   # No skipping of dose levels not previously tried is allowed, so if there happens to be skipping of dose
@@ -622,11 +629,11 @@ stg2.eff.rec <- function(post_samples, allow.doses, Max_tested_doseA,
 }
 
 
-stg3.eff.rec <- function(post_samples, allow.doses, proxy.thrd){
+stg3.eff.rec <- function(post_samples, allow.doses, Max_tested_doseA,
+                         proxy.thrd){
 
   ## Find the recommended dose for the end of the study (stage3)
   # proxy.thrd: The allowed proxy bandwidth for efficacy
-
 
   sim.alphas <- as.matrix(rbind(post_samples$alpha[, , 1]))
 
@@ -641,6 +648,12 @@ stg3.eff.rec <- function(post_samples, allow.doses, proxy.thrd){
     abs(a - max(effcy.dose)) <= proxy.thrd
   }))]
   recom.doses <- min(proxy.eff.doses)
+
+  # Don't recommend untested dose level
+  if (recom.doses > Max_tested_doseA) {
+    recom.doses <- Max_tested_doseA
+  }
+
   return(recom.doses)
 }
 
@@ -649,12 +662,13 @@ stg3.eff.rec <- function(post_samples, allow.doses, proxy.thrd){
 ###########################  Function in diagonosis   ##########################
 ################################################################################
 
-pp.nTTP <- function(post_samples, doses, cycles){
+pp.nTTP <- function(post_samples, doses, cycles, target){
 
   ## calculate the posterior probability of nttp < target for all cycles and doses
   # post_samples: posterior samples of stage3 model fitting
   # doses: all dose levels
   # cycles: all cycles
+  # target toxicity
 
   sim.betas <- as.matrix(rbind(post_samples$beta_other[1, , 1],
                                post_samples$beta_dose[, , 1],
@@ -664,11 +678,76 @@ pp.nTTP <- function(post_samples, doses, cycles){
     sapply(cycles, function(c){
       mean(apply(sim.betas, 2,
                  function(b){
-                   as.numeric(b[1] +  d * b[2] + c * b[3] <= 0.28)
+                   as.numeric(b[1] +  d * b[2] + c * b[3] <= target)
                  }))
     })
   })
-  colnames(pp.nTTPM) <- paste0("D", 1:6)
-  rownames(pp.nTTPM) <- paste0("C", 1:6)
+  colnames(pp.nTTPM) <- paste0("D", doses)
+  rownames(pp.nTTPM) <- paste0("C", cycles)
   return(pp.nTTPM)
 }
+
+dlt.rt.c1 <- function(list_simul, chSize){
+  # calculate cycle 1 dlt rate
+  sum(sapply(list_simul, function(a){
+    sum(a$patlist$cycle[which(a$patlist$dlt == 1)] == 1)})) /
+    (sum(sapply(list_simul, function(a){a$n.cohort})) * chSize)
+}
+
+dlt.rt.subseq <- function(list_simul, chSize){
+  # calculate dlt rate on cycle > 1
+  sum(sapply(list_simul, function(a){
+    sum(a$patlist$cycle[which(a$patlist$dlt == 1)] > 1)})) /
+    (sum(sapply(list_simul, function(a){a$n.cohort})) * chSize)
+}
+
+
+summarySE <- function(data=NULL, measurevar, groupvars=NULL, na.rm=FALSE,
+                      conf.interval=.95, .drop=TRUE) {
+  ## Summarizes data.
+  ## Gives count, mean, standard deviation, standard error of the mean, and confidence interval (default 95%).
+  ##   data: a data frame.
+  ##   measurevar: the name of a column that contains the variable to be summariezed
+  ##   groupvars: a vector containing names of columns that contain grouping variables
+  ##   na.rm: a boolean that indicates whether to ignore NA's
+  ##   conf.interval: the percent range of the confidence interval (default is 95%)
+  #' @importFrom plyr ddply rename
+
+  # New version of length which can handle NA's: if na.rm==T, don't count them
+  length2 <- function (x, na.rm=FALSE) {
+    if (na.rm) sum(!is.na(x))
+    else       length(x)
+  }
+
+  # This does the summary. For each group's data frame, return a vector with
+  # N, mean, sd and quantiles
+  datac <- ddply(data, groupvars, .drop=.drop,
+                 .fun = function(xx, col) {
+                   c(N    = length2(xx[[col]], na.rm=na.rm),
+                     mean = mean   (xx[[col]], na.rm=na.rm),
+                     sd   = sd     (xx[[col]], na.rm=na.rm),
+                     q.2.5 = as.numeric(quantile(xx[[col]], na.rm = na.rm, probs = 0.025)),
+                     q.97.5 = as.numeric(quantile(xx[[col]], na.rm = na.rm, probs = 0.975))
+                   )
+                 },
+                 measurevar
+  )
+
+  # Rename the "mean" column
+  datac <- rename(datac, c("mean" = measurevar))
+
+  datac$se <- datac$sd / sqrt(datac$N)  # Calculate standard error of the mean
+
+  # Confidence interval multiplier for standard error
+  # Calculate t-statistic for confidence interval:
+  # e.g., if conf.interval is .95, use .975 (above/below), and use df=N-1
+  ciMult <- qt(conf.interval/2 + .5, datac$N-1)
+  datac$ci <- datac$se * ciMult
+
+  return(datac)
+}
+
+
+
+
+

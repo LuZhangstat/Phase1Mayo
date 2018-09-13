@@ -1,4 +1,4 @@
-Package: phaseI
+Package: phase1PRMD
 Type: Package
 Title: Clinical Trials Phase I (Title Case)
 Version: 0.1.0
@@ -8,8 +8,8 @@ Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
 SystemRequirements: JAGS(http://mcmc-jags.sourceforge.net)
 Depends: 
-    R (>= 3.5.0),
-    coda
+    R (>= 3.2.3),
+    stats
 Encoding: UTF-8
 LazyData: true
 Imports:
@@ -17,10 +17,18 @@ Imports:
     phase1RMD,
     rjags (>= 4.1.0),
     R2WinBUGS,
-    stats
+    coda,
+    MASS,
+    ggplot2,
+    reshape2,
+    dplyr,
+    plyr,
+    RColorBrewer,
+    gridExtra,
+    kableExtra,
+    knitr
 RoxygenNote: 6.1.0
 Suggests: 
-    knitr,
     rmarkdown,
     testthat
 VignetteBuilder: knitr

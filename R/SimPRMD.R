@@ -1,20 +1,19 @@
-sim_phase1 <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
-                      eff.structure = matrix(0, nrow = 6, ncol = 6),
-                      eff.Sigma = diag(6), eff.sd_trans = 1, tox.target= 0.28,
-                      p_tox1 = 0.2, p_tox2 = 0.2, trialSize = 36, chSize = 3,
-                      thrd1 = 0.28, thrd2 = 0.28, proxy.thrd = 0.1,
-                      tox.matrix = NULL,
-                      wm = matrix(c(0, 0.5, 0.75, 1, 1.5,
-                                    0, 0.5, 0.75, 1, 1.5,
-                                    0, 0, 0, 0.5, 1),
-                                  byrow = T, ncol = 5), toxmax = 2.5,
-                      toxtype = NULL, intercept.alpha = NULL,
-                      coef.beta = NULL, cycle.gamma = NULL,
-                      param.ctrl = list(), inits.list.set = list(),
-                      n.chains = 1, effcy.flag = T, ICD.flag = T,
-                      DLT.drop.flag = T, testedD = T,  IED.flag = T,
-                      ICD_thrd = 0.3) {
-
+SimPRMD <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
+                   eff.structure = matrix(0, nrow = 6, ncol = 6),
+                   eff.Sigma = diag(6), eff.sd_trans = 1.5, tox.target= 0.28,
+                   p_tox1 = 0.2, p_tox2 = 0.2, trialSize = 36, chSize = 3,
+                   thrd1 = 0.28, thrd2 = 0.28, proxy.thrd = 0.1,
+                   tox.matrix = NULL,
+                   wm = matrix(c(0, 0.5, 0.75, 1, 1.5,
+                                 0, 0.5, 0.75, 1, 1.5,
+                                 0, 0, 0, 0.5, 1),
+                               byrow = T, ncol = 5), toxmax = 2.5,
+                   toxtype = NULL, intercept.alpha = NULL,
+                   coef.beta = NULL, cycle.gamma = NULL,
+                   param.ctrl = list(), inits.list.set = list(),
+                   n.chains = 1, effcy.flag = T, ICD.flag = T,
+                   DLT.drop.flag = T, testedD = T,  IED.flag = T,
+                   ICD_thrd = 0.3) {
 
   #' Simulation for an Adaptive, Multi-Stage Phase I Dose-Finding Design
   #'
@@ -33,7 +32,7 @@ sim_phase1 <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
   #' Gaussian distribution in efficacy data generation. Specifically,
   #' the \eqn{(i, j)}th element represents the mean value of \eqn{i}th dose level and
   #' \eqn{j}th cycle of the Gaussian distribution for efficacy data generation.
-  #' Default is a \eqn{6 \times 6} zero matrix
+  #' Default is a 6 by 6 zero matrix
   #' @param eff.Sigma The covariance matrix of the multivariate Guassian
   #' distribution in efficacy data generation.See details below.
   #' @param eff.sd_trans A positive number controls the skewness of the distribution
@@ -96,9 +95,9 @@ sim_phase1 <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
   #'  joint model assuming a normal prior. Default is non-informative priors.
   #' @param inits.list.set Default is list()
   #' @param n.chains  No. of MCMC chains in Bayesian model fitting. Default is 1
-  #' @param DLT.drop.flag Default is TRUE
-  #' @param effcy.flag Whether the patients should suspend the treatment
+  #' @param DLT.drop.flag Whether the patients should suspend the treatment
   #' when observing DLT. Default is TRUE
+  #' @param effcy.flag Whether we include efficacy response in modeling or not?
   #' @param ICD.flag Whether we allow dose changing for cycle > 1 in stage 1
   #' model or not? Default is TRUE. See details below
   #' @param testedD Default is TRUE. Whether we only allow ICD or IED among
@@ -108,15 +107,45 @@ sim_phase1 <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
   #' @param ICD_thrd The cut-off point of the posterior toxicity probability in
   #' defining ICD. Default is 0.3. See details below.
   #'
+  #' @details
+  #' The user can simulation efficacy response with different dose-efficacy
+  #' and cycle-efficacy pattern using argument \code{eff.structure},
+  #' \code{eff.Sigma} and \code{eff.sd_trans}. The sampling process of efficacy
+  #' response start from generating sample \eqn{z = {z1, \ldots, zd} } from multivariate Gaussian distribution
+  #' \deqn{z ~ MVN(\mu, V)},
+  #' where \eqn{\mu} and \eqn{V} are specified by \code{eff.structure} and
+  #' \code{eff.Sigma}, respectively. Define  \eqn{\phi} be the density of
+  #' \eqn{N(0, \sigma^2)} with CDF \eqn{\Phi}, and \eqn{\sigma^2}
+  #' is set by \code{eff.sd_trans}. Then the efficacy reponse is calculated by
+  #' taking the CDF of \eqn{z}:
+  #' \deqn{x={x1, \ldots, xd} = \Phi(z) = { \Phi(z1), \ldots, \Phi(zd)}} is
+  #' the generated efficacy response. Notice here the variance parameter
+  #' \eqn{\sigma^2_{trans}} controls the variance of the generated efficacy.
+  #'
   #' @return
   #' \item{senerio_sum}{contains \code{mnTTP.M} the matrix of mean nTTP for
   #' each dose and cycle and \code{pDLT.M} matrix of probability of observing
   #' DLT for each dose and cycle}
-  #' \item{alloc.perc}{The dose allocation percentage for cycle1}
-  #' \item{list_simul}{All simulations records}
-  #' \item{doses}{A vector of doses level of the study.}
-  #' \item{cycles}{A vector of cycles that the treatment plans to go through}
-  #'
+  #' \item{eff_sum}{When \code{effcy.flag == TRUE}, contains \code{eff.M} the
+  #' mean efficacy for each dose and cycle and \code{err.cor.ls} A list
+  #' with a length of dose levels numbers recording the marginal correlation
+  #' matrix across cycles of efficacy data for each dose level}
+  #' \item{list_simul}{A list of length numTrials. Each element includes
+  #' \code{patlist} which records all the treatment and outcome information;
+  #' \code{dose_aloca} which shows the cycle 1 dose allocation;
+  #' \code{doseA} which saves the recommended dose level for cycle 1
+  #' at the end of the phase I simulation, equals "early break" if the trial
+  #' was stop before finishing the trial; \code{n.cohort} indicates the last cohort
+  #' in the trial; \code{pp.nTTPM} gives the posterior probability of nTTP less
+  #' than target toxicity \code{tox.target} for all
+  #' dose level any cycles and \code{message} saves the message of each trial.}
+  #' \item{chSize}{The input argument \code{chSize}}
+  #' \item{sim.time}{Time cost in simulation}
+  #' \item{doses}{The input argument \code{doese}}
+  #' \item{cycles}{The input argument \code{cycles}}
+  #' \item{effcy.flag}{The input argument \code{effcy.flag}}
+  #' \item{proxy.thrd}{The input argument \code{proxy.thrd}}
+  #' \item{DLT.drop.flag}{The input argument \code{DLT.drop.flag}}
   #'
   #' @examples
   #'
@@ -134,24 +163,24 @@ sim_phase1 <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
   #'               = 5)                          # weighted matrix for toxicity matrix
   #'                                             # nrow = No.of type; ncol = No. of grade
   #' toxmax <- 2.5
-  #' tox.matrix <- aperm(prob[3, 2, , , , ], c(3, 2, 1, 4)) # may want to change the dimension
+  #' tox.matrix <- prob["MTD4", "flat", , , , ]
   #'
   #'
   #' #------- a flat dose-toxicity, dose-efficacy, cycle-efficacy pattern------#
-  #' #simul1 <- sim_phase1(numTrials = 1, tox.matrix = tox.matrix,
-  #' #                     eff.structure = eff.structure, eff.Sigma = eff.Sigma,
-  #' #                     eff.sd_trans = eff.sd_trans, wm = wm, toxmax = toxmax)
+  #' #simul1 <- SimPRMD(numTrials = 1, tox.matrix = tox.matrix,
+  #' #                  eff.structure = eff.structure, eff.Sigma = eff.Sigma,
+  #' #                  eff.sd_trans = eff.sd_trans, wm = wm, toxmax = toxmax)
   #'
   #' #------- a flat dose-toxicity pattern model ------#
-  #' simul2 <- sim_phase1(numTrials = 1, toxtype = c("H", "L", "M"),
-  #'                     intercept.alpha = c(1.9, 2.3, 2.6, 3.1),
-  #'                     coef.beta = c(-0.3, -0.2, -0.25),
-  #'                     cycle.gamma = 0, tox.target = 0.23,
-  #'                     thrd1 = 0.23, thrd2 = 0.23, p_tox1 = 0.2, p_tox2 = 0.2,
-  #'                     ICD.flag = FALSE, IED.flag = FALSE, effcy.flag = TRUE)
+  #' simul2 <- SimPRMD(numTrials = 1, toxtype = c("H", "L", "M"),
+  #'                   intercept.alpha = c(1.9, 2.3, 2.6, 3.1),
+  #'                   coef.beta = c(-0.3, -0.2, -0.25),
+  #'                   cycle.gamma = 0, tox.target = 0.23,
+  #'                   thrd1 = 0.23, thrd2 = 0.23, p_tox1 = 0.2, p_tox2 = 0.2,
+  #'                   ICD.flag = FALSE, IED.flag = FALSE, effcy.flag = TRUE)
   #'
-  #' print(simul2)
   #' summary(simul2)
+  #' plot(simul2)
   #'
   #' \dontrun{
   #'
@@ -162,8 +191,9 @@ sim_phase1 <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
   #' @importFrom arrayhelpers vec2array
   #' @importFrom phase1RMD GenToxProb
   #' @importFrom coda gelman.diag
+  #' @importFrom utils setTxtProgressBar
+  #' @importFrom utils txtProgressBar
   #' @export
-
 
   #######################################################################
   # input argments checking (modified later)
@@ -180,44 +210,47 @@ sim_phase1 <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
 
   ## test whether trialSize/chSize is integer
   if(trialSize %% chSize != 0){
-    stop("trialSize has to be the multiple of cohort size")
+    stop("trialSize has to be the multiple of cohort size\n")
   }
 
   if(ICD.flag == T & IED.flag == F & effcy.flag == T){
     stop("No model with options ICD.flag == T & IED.flag == F & effcy.flag == T \n")
   }
-
+  if(effcy.flag == T & is.null(proxy.thrd)){
+    stop("proxy.thrd is required when effcy.flag == TRUE\n")
+  }
   #######################################################################
   # Model fitting report
   #######################################################################
 
   if(effcy.flag == F){
     if(ICD.flag == T){
-      cat("Model: RMD with longitudinal toxicity and dynamic dose assignment \n\n\n")
+      cat("Model: RMD with longitudinal toxicity and dynamic dose assignment \n")
     } else{
-      cat("Model: RMD with longitudinal toxicity \n\n\n")
+      cat("Model: RMD with longitudinal toxicity \n")
     }
   } else {
     if(IED.flag == F){
-      cat("Model: RMD with longitudinal toxicity and efficacy \n\n\n")
+      cat("Model: RMD with longitudinal toxicity and efficacy \n")
     } else {
       if(ICD.flag == T){
         cat("Model: RMD with longitudinal toxicity and efficacy and
-            dynamic dose assignment\n\n\n")
+            dynamic dose assignment\n")
       } else {
         cat("Model: RMD with longitudinal toxicity and efficacy and
-            dynamic dose assignment on stg2\n\n\n")
+            dynamic dose assignment on stg2\n")
       }
       }
   }
 
   if(DLT.drop.flag == T){
-    cat("Patients will not continue treatment when having DLT \n\n")
+    cat("Patients will not continue treatment when having DLT \n")
   }
 
   ########################################################################
   # precalculate data
   ########################################################################
+
   MaxCycle <- length(cycles)
   Numdose <- length(doses)
   listdo <- paste0("D", doses)
@@ -233,6 +266,16 @@ sim_phase1 <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
   # obtain the mnTTP.M and pDLT.M for the senerio
   senerio_sum <- nTTP_summary(tox.matrix, nTTP.all, wm)
 
+  if(effcy.flag == T){
+    # obtain the eff.M for the senerio
+    eff_sum <- eff_summary(eff.structure = eff.structure, eff.Sigma = eff.Sigma,
+                           eff.sd_trans = eff.sd_trans, seed = seed,
+                           plot.flag = F)
+  }else{
+    eff_sum <- NULL
+  }
+
+
   # default prior settings for all model fitting #
   ctrl_param <- list(p1_beta_intercept = 0, p1_beta_cycle = 0,
                      p2_beta_intercept = 0.001, p2_beta_cycle = 0.001,
@@ -247,14 +290,15 @@ sim_phase1 <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
   ########################################################################
   # simulate data
   ########################################################################
+
+  t <- proc.time()
   set.seed(seed)
   list_simul <- list()
   seed_rand <- ceiling(runif(numTrials) * 1000000000)
-  t <- proc.time()
+  cat("Simulation process:\n")
+  pb <- txtProgressBar(min = 0, max = numTrials, style = 3)
   for(i in 1:numTrials) {
-    cat("\n", i, "th simulation:")
     set.seed(seed_rand[i])
-    s.t <- proc.time()
     ## pat_list: records of simuated patients
     patlist <- list(PatID = NULL, dose = NULL, cycle = NULL,
                     nTTP = NULL, dlt = NULL, efficacy = NULL, effz= NULL,
@@ -264,7 +308,7 @@ sim_phase1 <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
     patID_act<- NULL                          ## patID_list:   the ID of the active patients in the study
     rec_dose_act <- NULL                      ## rec_dose_act: recommend dose for the active patient in the study
     cycle_act <- NULL                         ## cycle_act:    the current cycle for the active patient
-    dose_aloca <- rep(0, Numdose)             ## dose_aloca:   dose alocation record
+    dose_aloca <- rep(0, Numdose)             ## dose_aloca:   dose allocation record for cycle 1
     ICD_act <- NULL                           ## ICD_act:      ICD information for the active patient
 
     ## for the begining of the phase I trill
@@ -273,6 +317,7 @@ sim_phase1 <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
     Max.cohort <- trialSize / chSize          ## maximum number of cohort
     end.label <- FALSE
     break.label <- FALSE                      ## whether the simulation is breaked before stage 3
+    message <- NULL                           ## record the message of each simulation, default is NULL.
     n.cohort <- 1
     while(n.cohort < (Max.cohort + 1) | length(cycle_act) > 0){
       ## end the simulation when no new cohort and no active patients
@@ -286,13 +331,13 @@ sim_phase1 <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
         # generate ID for new recruited patients
         patID_act <- c(patID_act, paste0("cohort", n.cohort, "subject", 1:chSize))
 
-        # generate dose for all activie patients
+        # generate dose for all active patients
         rec_dose_act <- c(rec_dose_act, rep(doseA, chSize))
 
         # generate cycle for all active patients
         cycle_act <- c(cycle_act, rep(1, chSize))
 
-        # generate ICD for all active patients ## may clean when buildind pkg
+        # generate ICD for all active patients ## may clean when building pkg
         ICD_act <- c(ICD_act, rep(paste0("D", doseA), chSize))
 
         # record dose allocation and new assigned dose for new cohort
@@ -338,7 +383,7 @@ sim_phase1 <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
           doseA <- doseA              ## observe 1 or 2 dlts, same dose for cohort 2
           dose_flag <- 1
         } else{
-          cat("\n early stop in the first cohort, 3 dlt observed")
+          message <- paste(message, "\n early stop in the first cohort, 3 dlt observed")
           break.label = T
           break
         }
@@ -366,8 +411,9 @@ sim_phase1 <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
           doseA <- doseA              ## 2 dlts out of 6 records, same dose
           dose_flag <- 1
         } else {
-          cat("\n more than two 2 dlts out of 6 records in the first 2 cohort")
-          cat(" early stop")
+          message <- paste(message, "\n early stop, ",
+                           "more than two 2 dlts out of 6 records",
+                           "in the first 2 cohort")
           break.label = T
           break
         }
@@ -406,7 +452,8 @@ sim_phase1 <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
                                  gelman.diag(as.mcmc.list(post_samples[[k]]),
                                              autoburnin = F)$psrf[ , 1])
             }
-            if(any(diag.converge > 1.1)){cat("\n MCMC fail to converge")}
+            if(any(diag.converge > 1.1)){
+              message <- paste(message, ("\n MCMC fail to converge"))}
           }
 
           ## dose recommendation ##
@@ -422,14 +469,15 @@ sim_phase1 <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
             ## mnTTP.dose1: Pr[(dose = 1) + (cycle = 1) < 0.28]
 
             if(mnTTP.dose1 < p_tox1) {
-              cat("\n early stop, the recommended dose is 1") # need to be modified
+              message <- paste(message,
+                               ("\n early stop, the recommended dose is 1"))
               break.label = T
               break
             } else {
               doseA <- doseA + 1    ## increase the dose
               dose_flag = 0
 
-              ### just for updating.....need to change....???##
+              ### Don't change dose level in the next cycle
               rec_dose_act <- rec_dose_act  ##
               cycle_act <- cycle_act + 1    ## update cycle
 
@@ -447,7 +495,7 @@ sim_phase1 <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
                                            p_tox1 = p_tox1, p_tox2 = p_tox2,
                                            ICD.flag = ICD.flag)
               if (length(allow.doses) == 0) {
-                cat("\n early stop, no allowable dose level")
+                message <- paste(message, "\n early stop, no allowable dose level")
                 break.label = T
                 break
               }
@@ -478,8 +526,8 @@ sim_phase1 <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
                                patID_act = patID_act, cycle_act = cycle_act,
                                rec_dose_act = rec_dose_act,
                                Max_tested_doseA = Max_tested_doseA,
-                               doses = doses, c1 = tox.target, p1 = ICD_thrd,
-                               DLT.drop.flag = DLT.drop.flag,
+                               doses = doses, cycles = cycles, c1 = tox.target,
+                               p1 = ICD_thrd, DLT.drop.flag = DLT.drop.flag,
                                y.dlt = outcome["y.dlt", ], testedD = testedD)
 
               cycle_act <- dos.rec.i.result$cycle_nxt
@@ -517,8 +565,7 @@ sim_phase1 <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
           ICD_act <- rec_dose_act
         }
       } else {
-        if(n.cohort == floor(Max.cohort / 2) ){cat("\n enter stage2")}
-        ### stage 2 ###  ??? document it
+        ### stage 2 ###
         if(n.cohort < Max.cohort | IED.flag == T){
 
           ## model fitting (Skip model fitting when ICD.flag turn off) ##
@@ -529,14 +576,14 @@ sim_phase1 <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
                                          c("beta_dose", "beta_other", "alpha", "gamma"),
                                        n.chains = n.chains,
                                        dose_flag = dose_flag)
-          ## safe dose determination ???
+          ## safe dose determination
           allow.doses <- stg1.safe.dos(post_samples = post_samples,
                                        doses = doses, cycles = cycles,
                                        thrd1 = thrd1, thrd2 = thrd2,
                                        p_tox1 = p_tox1, p_tox2 = p_tox2,
                                        ICD.flag = ICD.flag)
           if (length(allow.doses) == 0) {
-            cat("\n early stop, no allowable dose level")
+            message <- paste(message, "\n early stop, no allowable dose level")
             break.label = T
             break
           }
@@ -568,8 +615,8 @@ sim_phase1 <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
                            patID_act = patID_act, cycle_act = cycle_act,
                            rec_dose_act = rec_dose_act,
                            Max_tested_doseA = Max_tested_doseA,
-                           doses = doses, c1 = tox.target, p1 = ICD_thrd,
-                           DLT.drop.flag = DLT.drop.flag,
+                           doses = doses, cycles = cycles, c1 = tox.target,
+                           p1 = ICD_thrd, DLT.drop.flag = DLT.drop.flag,
                            y.dlt = outcome["y.dlt", ], testedD = testedD)
 
           cycle_act <- dos.rec.i.result$cycle_nxt
@@ -581,10 +628,6 @@ sim_phase1 <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
             proxy.thrd = proxy.thrd)
           rec_dose_act <- dos.rec.i.IED$rec_dose_nxt
           ICD_act <- dos.rec.i.IED$IED_nxt    ## IED information track
-          #        } else {
-          #          rec_dose_act <- dos.rec.i.result$rec_dose_nxt
-          #          ICD_act <- dos.rec.i.result$ICD_nxt  ## ICD information track
-          #        }
         } else {
           ### no dose modification ###
           cycle_act <- cycle_act + 1
@@ -601,7 +644,6 @@ sim_phase1 <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
       }
 
       if(n.cohort <= Max.cohort){n.cohort <- n.cohort + 1}     ## increase the number of cohorts
-      #cat("\n model fit: ", proc.time() - s.t, " cohort ", n.cohort)
     }
 
     #############################
@@ -609,7 +651,6 @@ sim_phase1 <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
     #############################
     if(break.label == F){
       # study dosen't break before stage3
-      cat("\n enter stage3")
       ### stage 3 ###
       ## model fitting ##
 
@@ -620,18 +661,18 @@ sim_phase1 <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
                                      n.iters = 5000, burn.in = 5000,
                                      retrieve_param = retrieve_param,
                                      n.chains = ifelse(n.chains == 1, 2, n.chains),
-                                     # n.chains = n.chains,
                                      # need at least two MCMC chains to check the convergence of MCMC chain
                                      dose_flag = dose_flag)
 
-        ## Check MCMC convergency ## ??? (document it...)
+        ## Check MCMC convergency ##
         diag.converge <- c()
         for(k in 1:length(retrieve_param)){
           diag.converge <- c(diag.converge,
                              gelman.diag(as.mcmc.list(post_samples[[k]]),
                                          autoburnin = F)$psrf[ , 1])
         }
-        if(any(diag.converge > 1.1)){cat("\n MCMC fail to converge")}
+        if(any(diag.converge > 1.1)){
+          message <- paste(message, ("\n MCMC fail to converge"))}
 
         ## safe dose determination
         allow.doses <- stg1.safe.dos(post_samples = post_samples,
@@ -641,14 +682,16 @@ sim_phase1 <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
                                      ICD.flag = ICD.flag)
 
         if (length(allow.doses) == 0) {
-          cat("\n early stop, no allowable dose level")
+          message <- paste(message, "\n early stop, no allowable dose level")
           break.label = T
         } else {
           ##################
           # dose recommend #
           ##################
+          Max_tested_doseA = max(rec_doseA) ## calculate the maximum tested dose level for cycle1
           doseA <- stg3.eff.rec(post_samples = post_samples,
                                 allow.doses = allow.doses,
+                                Max_tested_doseA = Max_tested_doseA,
                                 proxy.thrd = proxy.thrd)
         }
       } else {
@@ -667,7 +710,8 @@ sim_phase1 <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
                              gelman.diag(as.mcmc.list(post_samples[[k]]),
                                          autoburnin = F)$psrf[ , 1])
         }
-        if(any(diag.converge > 1.1)){cat("\n MCMC fail to converge")}
+        if(any(diag.converge > 1.1)){
+          message <- paste(message, ("\n MCMC fail to converge"))}
 
         ## safe dose determination
         allow.doses <- stg1.safe.dos(post_samples = post_samples,
@@ -677,7 +721,7 @@ sim_phase1 <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
                                      ICD.flag = ICD.flag)
 
         if (length(allow.doses) == 0) {
-          cat("\n early stop, no allowable dose level")
+          message <- paste(message, "\n early stop, no allowable dose level")
           break.label = T
         } else {
 
@@ -689,38 +733,38 @@ sim_phase1 <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
 
           ## recommend dose for new cohort ##
 
-          doseA <- stg1.dos.rec(post_samples = post_samples, doses = doses,
+          doseA <- stg3.dos.rec(post_samples = post_samples, doses = doses,
                                 tox.target = tox.target,
                                 Max_tested_doseA = Max_tested_doseA)
         }
       }
 
-      pp.nTTPM <- pp.nTTP(post_samples, doses, cycles)
+      pp.nTTPM <- pp.nTTP(post_samples, doses, cycles, tox.target)
 
       ## save the simulation result, dose alocation result and recommended dose level
       patlist$effz <- NULL
       list_simul[[i]] <- list(patlist = patlist, dose_aloca = dose_aloca,
                               doseA = ifelse(break.label, "early break", doseA),
-                              n.cohort = Max.cohort, pp.nTTPM = pp.nTTPM)
+                              n.cohort = Max.cohort, pp.nTTPM = pp.nTTPM,
+                              message = message)
       # don't recommmend dose if no allowable dose from stage3 model fitting
     } else {
       ## If the study break before entering stage 3, just save the simulation data
       list_simul[[i]] <- list(patlist = patlist, dose_aloca = dose_aloca,
                               doseA = "early break",
                               n.cohort = ifelse(n.cohort < Max.cohort,
-                                                n.cohort, Max.cohort))
+                                                n.cohort, Max.cohort),
+                              message = message)
     }
+    setTxtProgressBar(pb, i)
   }
-  #-------------allocation percentage-------------------#
-  alloc <- sapply(list_simul, function(a){
-    a$dose_aloca
-  })
-  alloc.perc <- apply(alloc, 1, function(a){
-    sum(a)/sum(alloc)
-  })
-  res <- list(senerio_sum = senerio_sum, alloc.perc = alloc.perc,
-              list_simul = list_simul, doses = doses, cycles = cycles)
-  attr(res,'class') <- 'sim_phase1'
+  close(pb)
+  sim.time <- t - proc.time()
+  res <- list(senerio_sum = senerio_sum, eff_sum = eff_sum,
+              list_simul = list_simul, doses = doses, cycles = cycles,
+              chSize = chSize, sim.time = sim.time, effcy.flag = effcy.flag,
+              proxy.thrd = proxy.thrd, DLT.drop.flag = DLT.drop.flag)
+  attr(res,'class') <- 'SimPRMD'
   return(res)
 }
 

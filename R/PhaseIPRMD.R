@@ -1,4 +1,4 @@
-#' PhaseI: A package for model-based phase I designs with both clinician-assessed
+#' Phase1PRMD: A package for model-based phase I designs with both clinician-assessed
 #' AEs and PROs as toxicity endpoints, to improve accuracy in dose selection and
 #' to incorporate individualized dosing based on patient’s tolerance from prior
 #' treatment cycles.
@@ -10,6 +10,6 @@
 #' The foo functions ...
 #'
 #' @docType package
-#' @name PhaseI
+#' @name Phase1PRMD
 NULL
 
