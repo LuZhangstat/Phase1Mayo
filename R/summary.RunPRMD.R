@@ -102,7 +102,7 @@ print.summary.RunPRMD <- function(x, ...){
     cat("\n The mean efficacy for all doses and cycles: \n")
     print(format(round(x$eff.M, 3), 3))
   }
-  cat("Recommend dose for cycle 1: ", x$object$doseA, "\n")
+  cat("Recommend dose for new cohort: ", x$object$doseA, "\n")
   cat("\nFor patients: \n", x$object$pat_rec$patID,
       "\non cycle: \n", x$object$pat_rec$cycle,
       "\nWe suggest dose levels: \n", x$object$pat_rec$dose, "\n")
@@ -173,5 +173,64 @@ plot.RunPRMD <- function(x, ..., select_cycle = x$cycles){
       scale_x_discrete(breaks = x$doses, labels = x$doses)
     print(peff)
   }
+}
+
+
+patlist.display <- function(patlist, n.dose, n.cycle){
+
+  #' Display a patient records
+  #'
+  #' @param patlist The patient records
+  #' @param n.dose  The number of dose in the study
+  #' @param n.cycle The number of cycle in the study
+  #'
+  #' @return
+  #' @import RColorBrewer
+  #' @importFrom dplyr mutate rowwise mutate_at starts_with select funs vars
+  #' @import kableExtra
+  #' @import knitr
+  #' @importFrom utils capture.output
+  #' @export
+  #'
+
+  color.pal <- brewer.pal(n = n.dose, name = "RdYlGn")[n.dose:1]
+  l <- length(patlist$PatID)
+  uniq_ID <- unique(patlist$PatID)
+
+  n.patient <- length(uniq_ID)
+  report <- matrix(NA, nrow = n.patient, ncol = n.cycle)
+  colnames(report) <- c(paste0("cycle", 1:n.cycle))
+  rownames(report) <- uniq_ID
+
+  for(i in 1:l){
+    report[which(uniq_ID == patlist$PatID[i]),
+           patlist$cycle[i]] <-
+      paste(format(round(patlist$nTTP[i],3),3), patlist$dlt[i],
+            patlist$dose[i], sep = ",")
+  }
+
+  report.data <- data.frame(report)
+
+  invisible(capture.output(print(
+    report.data %>%
+      mutate(PatID = row.names(.))%>%
+      rowwise()%>%
+      mutate_at(vars(starts_with("cycle")), funs(
+        ifelse(!is.na(.),
+               ifelse(as.numeric(unlist(strsplit(as.character(.), ","))[2]) == 0,
+                      cell_spec(., color = "white", bold = T,
+                                background = color.pal[as.numeric(strsplit(as.character(.), ",")[[1]])[3]]),
+                      cell_spec(., color = "black", bold = T,
+                                background = color.pal[as.numeric(strsplit(as.character(.), ",")[[1]])[3]])),
+               cell_spec(., color = "white", background = "white"))
+      ))%>%
+      # rowwise()%>%
+      #   mutate_at(vars(starts_with("cycle")), funs(format(round(as.numeric(unlist(
+      #     strsplit(as.character(.), ","))[1]), 3), 3)))%>%
+      select(PatID, starts_with("cycle"))%>%
+      kable(escape = F, format = "html") %>%
+      kable_styling() %>%
+      footnote((general = "the entries in each cell are formatted in: nTTP, dlt, dose"))
+  )))
 }
 

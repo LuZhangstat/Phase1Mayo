@@ -759,7 +759,7 @@ SimPRMD <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
     setTxtProgressBar(pb, i)
   }
   close(pb)
-  sim.time <- t - proc.time()
+  sim.time <- proc.time() - t
   res <- list(senerio_sum = senerio_sum, eff_sum = eff_sum,
               list_simul = list_simul, doses = doses, cycles = cycles,
               chSize = chSize, sim.time = sim.time, effcy.flag = effcy.flag,

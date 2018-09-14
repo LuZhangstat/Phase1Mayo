@@ -254,7 +254,7 @@ RunPRMD <-function(seed = 1234, patlist, patID_act = NULL,
     if(IED.flag == T){
       if(n.cohort < Max.cohort / 2){
         if(ICD.flag == T & length(act.index) != 0){
-          cat("Recommend dose for next cohort, and current paitents for next")
+          cat("Recommend dose for next cohort, and current patients for next")
           cat(" cycle based on longitudinal toxicity\n\n")
         }else{
           cat("Recommend dose for next cohort based on longitudinal toxicity\n\n")
@@ -577,7 +577,7 @@ RunPRMD <-function(seed = 1234, patlist, patID_act = NULL,
       pat_rec$dose <- dose_act[act.index]
     }
   }
-  cat("Recommend dose for cycle 1: ", doseA, "\n")
+  cat("Recommend dose for new cohort: ", doseA, "\n")
   cat("\nFor patients: \n", pat_rec$patID, "\non cycle: \n", pat_rec$cycle,
       "\nWe suggest dose levels: \n", pat_rec$dose, "\n")
   res <- list(patlist = patlist, doseA = doseA, pat_rec = pat_rec,

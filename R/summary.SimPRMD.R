@@ -137,18 +137,20 @@ print.summary.SimPRMD <- function(x,
   }
   cat("\n In total", x$n.trial, "simulations, with", x$n.stop,
       "early stop cases ")
-  cat("\n In average,", x$m.n.pat, "patients are enrolled in each trial")
-  cat("\n In average, we observe ", x$m.dlt.rt, " dlt per patient, ")
+  cat("\n On average,", x$m.n.pat, "patients are enrolled in each trial")
+  cat("\n On average, we observe ", x$m.dlt.rt, " dlt per patient, ")
   cat("\n", x$c1_dlt.rt, "from cycle 1 and ", x$cs_dlt.rt, "from cycle > 1" )
-  cat("\n In average, every patient took", x$m.dose.sum, " doses")
-  cat("\n In average, the distance from the perfect trajectory is ", x$m.dis.to.idl)
-  cat("\n\n The summary of median survival duration: \n")
+  cat("\n On average, the culmulative dose per patient is", x$m.dose.sum,
+      " doses")
+  cat("\n On average, the distance from the perfect trajectory is ",
+      x$m.dis.to.idl)
+  cat("\n\n The summary of median treatment duration (in cycle): \n")
   print(format(round(x$sur_sum, 3), 3))
-  cat("\n The dose allocation table for cycle 1 of this simulation is: \n")
+  cat("\n The dose allocation for cycle 1 of this simulation is: \n")
   print(paste0(format(round(x$alloc.perc*100, 3), 3), "%"))
-  cat("\n The dose allocation table for cycle > 1 of this simulation is: \n")
+  cat("\n The dose allocation for cycle > 1 of this simulation is: \n")
   print(paste0(format(round(x$sbsq.alloc*100, 3), 3), "%"))
-  cat("\n The dose recommendation table for cycle 1 of this simulation is: \n")
+  cat("\n The dose recommendation for cycle 1 of this simulation is: \n")
   print(paste0(format(round(x$rec.perc*100, 3), 3), "%"))
   invisible(x)
 }
@@ -304,3 +306,5 @@ plot.SimPRMD <- function(x, ..., title.add = TRUE){
     }
   }
 }
+
+
