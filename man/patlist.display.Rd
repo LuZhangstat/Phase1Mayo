@@ -7,7 +7,11 @@
 patlist.display(patlist, n.dose, n.cycle)
 }
 \arguments{
-\item{n.cycle}{}
+\item{patlist}{The patient records}
+
+\item{n.dose}{The number of dose in the study}
+
+\item{n.cycle}{The number of cycle in the study}
 }
 \description{
 Display a patient records

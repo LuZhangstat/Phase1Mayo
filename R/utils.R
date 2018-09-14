@@ -483,7 +483,6 @@ stg1.dos.rec.i <- function(post_samples, uniq_ID, patID_act,
   }
 
   if(length(cycle_nxt) == 0){
-    cat("\n no patient should continue for the next cycle")
     return(list(patID_nxt = NULL, cycle_nxt = NULL, rec_dose_nxt = NULL,
                 ICD_nxt = NULL))}
 
