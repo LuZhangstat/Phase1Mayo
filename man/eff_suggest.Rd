@@ -53,7 +53,7 @@ diag(eff.Sigma[, -1]) = 0.5
 eff.check <- eff_summary(eff.structure = eff.structure,
                          eff.Sigma = eff.Sigma,
                          eff.sd_trans = eff.sd_trans,
-                         plot.flag = TRUE)
+                         plot.flag = FALSE)
 eff.check$eff.M
 eff.check$eff.cor.ls
 

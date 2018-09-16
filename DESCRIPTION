@@ -36,5 +36,4 @@ Imports:
     knitr
 RoxygenNote: 6.1.0
 Suggests:
-VignetteBuilder: knitr
 License: GPL (>= 2)

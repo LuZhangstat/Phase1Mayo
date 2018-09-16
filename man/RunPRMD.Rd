@@ -202,27 +202,5 @@ plot(test)
 plot(test, select_cycle = 1:2)
 
 
-# When we pick the records before 12th cohort enrolled in the study
-patlist <- lapply(patlist_sim, function(a){a <- a[-(128:L)]})
-patlist.display(patlist, n.dose = 6, n.cycle = 6)
-
-patID_act <- c("cohort6subject1", "cohort6subject2", "cohort1subject3",
-               "cohort7subject1", "cohort7subject2", "cohort7subject3",
-               "cohort8subject1", "cohort8subject2", "cohort8subject3",
-               "cohort9subject1", "cohort9subject2", "cohort9subject3",
-               "cohort10subject1", "cohort10subject2", "cohort10subject3",
-               "cohort11subject1", "cohort11subject2", "cohort11subject3")
-cycle_act <- c(6, 6, 6, 5, 5, 5, 4, 4, 4, 3, 3, 3, 2, 2, 2, 1, 1, 1)
-dose_act <- c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
-dlt_act <- c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-
-test2 <- RunPRMD(patlist = patlist, patID_act = patID_act,
-                 cycle_act = cycle_act, dose_act = dose_act,
-                 dlt_act = dlt_act, trialSize = 36, chSize = 3,
-                 effcy.flag = TRUE, ICD.flag = FALSE, DLT.drop.flag = TRUE,
-                 IED.flag = FALSE, ICD_thrd = 0.3)
-summary(test2)
-plot(test2)
-
 
 }
