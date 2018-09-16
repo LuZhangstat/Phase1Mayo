@@ -2,7 +2,7 @@
 % Please edit documentation in R/summary.RunPRMD.R
 \name{summary.RunPRMD}
 \alias{summary.RunPRMD}
-\title{Summary an RunPRMD object}
+\title{Summary a RunPRMD object}
 \usage{
 \method{summary}{RunPRMD}(object, ...)
 }
@@ -13,13 +13,20 @@
 }
 \value{
 \item{object}{The output of function \code{RunPRMD}}
-\item{mnttp.M}{The mean nTTP for all doses and cycles}
-\item{dlt.count.M}{The number of DLT for all doses and cycles}
-\item{eff.M}{The mean efficacy for all doses and cycles. Return \code{NULL}
-when \code{object$effcy.flag == TRUE}}
+  \item{mnttp.M}{The mean nTTP for all doses and cycles}
+  \item{dlt.count.M}{The number of DLT for all doses and cycles}
+  \item{eff.M}{The mean efficacy for all doses and cycles. Return
+  \code{NULL} when \code{object$effcy.flag == TRUE}}
 }
 \description{
-Summary an RunPRMD object
+Summary a RunPRMD object. Print the information of recommended dosage
+selection along with the mean nTTP and the number of DLT for all doses and
+cycles. Will print the mean efficacy for all doses and cycles when
+implementing \code{\link{RunPRMD}} with option \code{effcy.flag = TRUE}. The
+collected data is displayed in a human-readable table whose cell contain 3
+values including observed nTTP, DLT, and dose assignment. The higher the
+dose, the warmer the cell background color is. The black color of the
+records indicates DLT equals 1.
 }
 \examples{
 ## Check ?RunPRMD for example

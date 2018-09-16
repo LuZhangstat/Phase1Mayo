@@ -2,7 +2,7 @@
 % Please edit documentation in R/summary.RunPRMD.R
 \name{plot.RunPRMD}
 \alias{plot.RunPRMD}
-\title{nTTP and efficacy boxplots of a RunPRMD object}
+\title{Plot nTTP and efficacy boxplots of a RunPRMD object}
 \usage{
 \method{plot}{RunPRMD}(x, ..., select_cycle = x$cycles)
 }
@@ -11,11 +11,12 @@
 
 \item{...}{other arguments ignored (for compatibility with generic)}
 
-\item{select_cycle}{A vector indication the cycle in the boxplot.
-Default is \code{cycle} of \code{x}.}
+\item{select_cycle}{A vector indication the cycle in the boxplot. Default
+is \code{cycle} of \code{x}.}
 }
 \description{
-nTTP and efficacy boxplots of a RunPRMD object
+Plot nTTP boxplots of a RunPRMD object. Plot efficacy boxplots when
+implementing \code{RunPRMD} with option \code{effcy.flag == TRUE}.
 }
 \examples{
 ## Check ?RunPRMD for example

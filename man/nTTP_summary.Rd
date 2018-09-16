@@ -2,26 +2,31 @@
 % Please edit documentation in R/nTTP_summary.R
 \name{nTTP_summary}
 \alias{nTTP_summary}
-\title{Generate the probability of all possible combination of toxicity type and grade}
+\title{Generate the mean nTTP score and the probability of observing DLT for all
+doses and cycles}
 \usage{
 nTTP_summary(Tox.prob.M, nTTP.all, wm)
 }
 \arguments{
-\item{Tox.prob.M}{toxicity probability matrix with dimension:
-dose cycle type grade. Tox.prob.M can be the output of the
-build-in matrix of function GenToxProb in package phase1RMD}
+\item{Tox.prob.M}{Toxicity probability matrix with 4 dimension: dose,
+cycle, type, grade. Tox.prob.M can be the output of the build-in matrix
+of function \code{\link[phase1RMD]{GenToxProb}} in package phase1RMD.
+See more details about how to generate toxicity probability matrices in
+the help document of \code{\link[phase1RMD]{GenToxProb}}.}
 
 \item{nTTP.all}{The output of \code{\link{nTTP.array}}}
 
-\item{wm}{(numerical matric) Toxicity weighted matrix, with row be
-the type of the toxicity and column be the toxicity grade}
+\item{wm}{(numerical matric) Toxicity weighted matrix, with row be the
+type of the toxicity and column be the toxicity grade}
 }
 \value{
-\item{mnTTP.M}{matrix of mean nTTP for each dose and cycle}
-\item{pDLT.M}{matrix of probability of observing DLT for each dose and cycle}
+\item{mnTTP.M}{matrix of mean nTTP for all doses and cycles}
+  \item{pDLT.M}{matrix of probability of observing DLT for all doses and
+  cycles}
 }
 \description{
-\code{nTTP_summary} generate the nTTP list for all combination of toxicity type and grade
+\code{nTTP_summary} generates the mean nTTP score and the probability of
+observing DLT for all doses and cycles
 }
 \examples{
 
@@ -39,9 +44,5 @@ nTTP.all <- nTTP.array(wm, toxmax)
 tox.matrix <- prob["MTD4", "flat", , , , ]
 
 nTTP_summary(tox.matrix, nTTP.all, wm)
-
-\dontrun{
-
-}
 
 }

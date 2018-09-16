@@ -25,6 +25,8 @@
 \item{sbsq.alloc}{Dose allocation of subsequent cycles (cycle > 1)}
 \item{rec.prec}{The precentage of Recommended doses for cycle 1}
 \item{effcy.flag}{Argument \code{effcy.flag} of function \code{SimPRMD}}
+\item{DLT.drop.flag}{Argument \code{DLT.drop.flag} of function
+\code{SimPRMD}}
 }
 \description{
 Summary a SimPRMD object

@@ -1,20 +1,24 @@
 
 nTTP_summary <- function(Tox.prob.M, nTTP.all, wm) {
 
-  #' Generate the probability of all possible combination of toxicity type and grade
+  #' Generate the mean nTTP score and the probability of observing DLT for all
+  #' doses and cycles
   #'
-  #' \code{nTTP_summary} generate the nTTP list for all combination of toxicity type and grade
+  #' \code{nTTP_summary} generates the mean nTTP score and the probability of
+  #' observing DLT for all doses and cycles
   #'
-  #' @param Tox.prob.M      toxicity probability matrix with dimension:
-  #' dose cycle type grade. Tox.prob.M can be the output of the
-  #' build-in matrix of function GenToxProb in package phase1RMD
+  #' @param Tox.prob.M      Toxicity probability matrix with 4 dimension: dose,
+  #'   cycle, type, grade. Tox.prob.M can be the output of the build-in matrix
+  #'   of function \code{\link[phase1RMD]{GenToxProb}} in package phase1RMD.
+  #'   See more details about how to generate toxicity probability matrices in
+  #'   the help document of \code{\link[phase1RMD]{GenToxProb}}.
   #' @param nTTP.all The output of \code{\link{nTTP.array}}
-  #' @param wm      (numerical matric) Toxicity weighted matrix, with row be
-  #' the type of the toxicity and column be the toxicity grade
+  #' @param wm      (numerical matric) Toxicity weighted matrix, with row be the
+  #'   type of the toxicity and column be the toxicity grade
   #'
-  #' @return
-  #' \item{mnTTP.M}{matrix of mean nTTP for each dose and cycle}
-  #' \item{pDLT.M}{matrix of probability of observing DLT for each dose and cycle}
+  #' @return \item{mnTTP.M}{matrix of mean nTTP for all doses and cycles}
+  #'   \item{pDLT.M}{matrix of probability of observing DLT for all doses and
+  #'   cycles}
   #'
   #' @examples
   #'
@@ -32,10 +36,6 @@ nTTP_summary <- function(Tox.prob.M, nTTP.all, wm) {
   #' tox.matrix <- prob["MTD4", "flat", , , , ]
   #'
   #' nTTP_summary(tox.matrix, nTTP.all, wm)
-  #'
-  #' \dontrun{
-  #'
-  #' }
   #'
   #' @importFrom arrayhelpers vec2array
   #' @export

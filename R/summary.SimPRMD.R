@@ -4,8 +4,6 @@ summary.SimPRMD <- function(object, ...){
 
   #' Summary a SimPRMD object
   #'
-  #' Summary a SimPRMD object
-  #'
   #' @param object SimPRMD object to summarise
   #' @param ... other arguments ignored (for compatibility with generic)
   #'
@@ -23,7 +21,8 @@ summary.SimPRMD <- function(object, ...){
   #' \item{sbsq.alloc}{Dose allocation of subsequent cycles (cycle > 1)}
   #' \item{rec.prec}{The precentage of Recommended doses for cycle 1}
   #' \item{effcy.flag}{Argument \code{effcy.flag} of function \code{SimPRMD}}
-  #'
+  #' \item{DLT.drop.flag}{Argument \code{DLT.drop.flag} of function
+  #' \code{SimPRMD}}
   #'
   #'
   #' @examples
@@ -106,7 +105,8 @@ summary.SimPRMD <- function(object, ...){
               m.dose.sum = m.dose.sum, m.dis.to.idl = m.dis.to.idl,
               sur_sum = sur_sum, alloc.perc = alloc.perc,
               sbsq.alloc = sbsq.alloc, rec.perc = rec.perc,
-              effcy.flag = object$effcy.flag)
+              effcy.flag = object$effcy.flag,
+              DLT.drop.flag = object$DLT.drop.flag)
   class(ans) <- "summary.SimPRMD"
   ans
 }
@@ -135,11 +135,15 @@ print.summary.SimPRMD <- function(x,
     cat("\n The mean efficacy for all dose levels and cycles are: \n")
     print(x$eff_sum$eff.M)
   }
-  cat("\n In total", x$n.trial, "simulations, with", x$n.stop,
+  cat("\nIn total", x$n.trial, "simulations, with", x$n.stop,
       "early stop cases ")
-  cat("\n On average,", x$m.n.pat, "patients are enrolled in each trial")
-  cat("\n On average, we observe ", x$m.dlt.rt, " dlt per patient, ")
-  cat("\n", x$c1_dlt.rt, "from cycle 1 and ", x$cs_dlt.rt, "from cycle > 1" )
+  cat("\nOn average,", x$m.n.pat, "patients are enrolled in each trial")
+  if(x$DLT.drop.flag == T){
+    cat("\nOn average, the DLT drop off rate is ", round(x$m.dlt.rt*100, 2),
+        "%")
+    cat("\nDLT drop off rate on Cycle 1 is ", round(x$c1_dlt.rt*100, 2),
+        " DLT drop off rate on cycle > 1 is ", round(x$cs_dlt.rt*100, 2))
+  }
   cat("\n On average, the culmulative dose per patient is", x$m.dose.sum,
       " doses")
   cat("\n On average, the distance from the perfect trajectory is ",
@@ -155,12 +159,15 @@ print.summary.SimPRMD <- function(x,
   invisible(x)
 }
 
-
 plot.SimPRMD <- function(x, ..., title.add = TRUE){
 
   #' Plots of a SimPRMD object
   #'
-  #' Plots of a SimPRMD object.
+  #' Plot the predictive probability of nTTP < target toxicity for all cycles
+  #' and doses , the mean nTTP vs cycle1 and cycle > 2 for all doses of a
+  #' SimPRMD object. Plot median treadment duration boxplot along with the DLT
+  #' drop off rate when implementing \code{\link{SimPRMD}} with option
+  #' \code{DLT.drop.flag = TRUE}.
   #'
   #' @param x SimPRMD object to summarise
   #' @param ... other arguments ignored (for compatibility with generic)
@@ -258,7 +265,7 @@ plot.SimPRMD <- function(x, ..., title.add = TRUE){
   if(x$DLT.drop.flag == T){
     # draw the survival plot when DLT.drop.flag is TRUE
     readline(prompt="Press [enter] to check the next plot")
-    ## survival duration boxplot ##
+    ## median treatment duration boxplot ##
     surv_dur <- sapply(x$list_simul, function(a){
       median(rev(a$patlist$cycle)[!duplicated(rev(a$patlist$PatID))])
     })

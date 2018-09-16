@@ -9,15 +9,12 @@
 prob
 }
 \description{
-A 6 dimension array providing the toxicity probability.
-The dimension of the toxicity probability matrix is 4 3 6 6 3 5 which
-represents scenario, cycle effect, dose level, cycle number, tox type,
-and tox grade. Scenarios are order in a way that first scenario is MTD = dose 2,
-and second is MTD = dose 3, and third is MTD = dose 4, and fourth
-is MTD = dose level 5. Cycle effect is ordered from decreasing toxicity
-over cycles, flat, and increasing.
-}
-\references{
-???
+A 6 dimension array providing the toxicity probability of different
+scenarios. The dimension is 4 3 6 6 3 5 which represents scenario, cycle
+effect, dose level, cycle number, toxicity type, and tox grade. Scenarios are
+ordered in a way that the first scenario is MTD = dose 2, the second is MTD =
+dose 3, the third is MTD = dose 4, and the fourth is MTD = dose 5. The three
+Cycle effect trend are decreasing, flat, and increasing toxicity trend over
+cycles. There are 6 doses, 6 cycles, 3 toxicity types and 5 toxicity grades.
 }
 \keyword{datasets}

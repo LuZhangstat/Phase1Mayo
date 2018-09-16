@@ -7,20 +7,21 @@
 nTTP.array(wm, toxmax)
 }
 \arguments{
-\item{wm}{(numeric matrix, m by n) Toxicity weighted matrix, with row be
-the type of the toxicity and column be the toxicity grade}
+\item{wm}{(numeric matrix, m by n) Toxicity weighted matrix, with row
+be the type of the toxicity and column be the toxicity grade}
 
 \item{toxmax}{(scalar)         Normalized constant for nTTP}
 }
 \value{
-An m dimensional array with dimension \eqn{(n, n, \ldots, n)}.
-The \eqn{(d1, d2 ,\ldots,dm), {di, i = 1\ldots, m} \in (1, \ldots, n)}th
-element is the nTTP when the grade of \eqn{i}th type of toxicity has
-\eqn{di}th toxicity grade.
+An m dimensional array with dimension \eqn{(n, n, \ldots, n)}. The
+  \eqn{(d1, d2 ,\ldots,dm), {di, i = 1\ldots, m} \in (1, \ldots, n)}th
+  element is the nTTP when the grade of \eqn{i}th type of toxicity has
+  \eqn{di}th toxicity grade.
 }
 \description{
-\code{nTTP.array} generate the nTTP dictionary for all combination of toxicity
-type and grade with a given toxicity weighted matrix.
+\code{nTTP.array} generates the nTTP dictionary for all combination of
+toxicity type and grade with a given toxicity weighted matrix. Used in
+function \code{\link{nTTP_summary}} for checking the toxicity scenario.
 }
 \examples{
 wm = matrix(c(0, 0.5, 0.75, 1, 1.5,

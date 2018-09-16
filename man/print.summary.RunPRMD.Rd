@@ -12,5 +12,7 @@
 \item{...}{other arguments ignored (for compatibility with generic)}
 }
 \description{
-Displays a useful description of a summary.RunPRMD object
+Displays a useful description of a summary.RunPRMD object. Call by
+\code{link{summary.RunPRMD}}. Check \code{link{summary.RunPRMD}} for the
+details of the print information.
 }

@@ -103,10 +103,6 @@ gen_nTTP_dlt <- function(dose_cycle_PatID, tox.prob.M, wm, nTTP.all,
     y.eff <- pnorm(y.effz, mean = 0, sd = eff.sd_trans)
   }
 
-  # if(cycle == 3){y.effz = runif(1, min = 0.2, max = 0.8); y.eff = abs(y.effz)} else{
-  #   y.effz = -1; y.eff = -1
-  # }
-
   return(c(y.nTTP = y.nTTP, y.dlt = y.dlt, y.eff = y.eff, y.effz = y.effz))
 }
 
@@ -426,12 +422,7 @@ stg1.dos.rec.i <- function(post_samples, uniq_ID, patID_act,
   # find the activie patients need prediction for next cycle
   cycle_nxt <- cycle_act + 1
   if(DLT.drop.flag == T){
-    if(is.null(y.dlt)){
-      cat("y.dlt is not specified when DLT.drop.flag = T ")
-      return
-    }else{
-      nxt.index <- which(cycle_nxt <= max(cycles) & y.dlt == 0)
-    }
+    nxt.index <- which(cycle_nxt <= max(cycles) & y.dlt == 0)
   } else {
     nxt.index <- which(cycle_nxt <= max(cycles))
   }
@@ -457,11 +448,6 @@ stg1.dos.rec.i <- function(post_samples, uniq_ID, patID_act,
       })
     })
 
-  #  }
-  #  if (dim(M)[1] > 1 & dim(M)[2] > 1){
-  #    rownames(M) <- paste0("D", doses)
-  #    colnames(M) <- patID_nxt
-
   ## find the maximum dose that can be consider as safe and use as recommend dose for next level
   rec_dose_nxt <- apply(M, 2, function(x){max(which(x >= p1))})
 
@@ -486,7 +472,7 @@ stg1.dos.rec.i <- function(post_samples, uniq_ID, patID_act,
     return(list(patID_nxt = NULL, cycle_nxt = NULL, rec_dose_nxt = NULL,
                 ICD_nxt = NULL))}
 
-  ## check the ICD information, may clean up for building packages ##
+  ## check the ICD information, just used in developing packages ##
   ICD_nxt <- paste0("ICD: D", rec_dose_nxt, ": ",
                     format(round(M[cbind(rec_dose_nxt, 1:n.subs)], 3),
                            nsmall= 3))
@@ -524,12 +510,41 @@ stg2.eff.rec.i <- function(post_samples, cycle_nxt, rec_dose_nxt, proxy.thrd){
   # we tend to choose lower dose level when the posterior predictive estimate of efficacy
   # is no less than Max.effecy - proxy.thrd
 
-  ## check the ICD information, may clean up for building packages ##
+  ## check the ICD information, just used in developing packages ##
   IED_nxt <- paste0("IED: D", rec_dose_nxt, ": ",
                     format(round(Pop.EFF[cbind(cycle_nxt, rec_dose_nxt)], 3),
                            nsmall= 3))
 
   return(list(rec_dose_nxt = rec_dose_nxt, IED_nxt = IED_nxt))
+}
+
+stg2.eff.rec.i.all.cycle <- function(post_samples, allow.doses, cycles,
+                                     proxy.thrd){
+
+  ## after finding the safe dose of the trial,
+  ## calculate efficacious dose among the safe dose for all cycle
+  ## allow.doses: the safe dose of the trial
+  ## cycles: the treatment cycles of the trial
+  ## proxy.thrd: the buffer of choosing efficacious dose
+  ## return:
+  ## recom.MED.cycle: recommended MED for all cycles
+
+  sim.alphas <- as.matrix(rbind(post_samples$alpha[, , 1]))
+
+  ## calculate posterior estimation of efficacy for all allowable dose all cycles
+  PEFF <- sapply(allow.doses, function(d) {
+    sapply(cycles, function(c){
+      mean(apply(sim.alphas, 2, function(o) {
+        as.numeric(o[1] + o[2] * d + o[3] * d^2 + o[4] * c)    # estimate efficacy for dose a cycle 1
+      }))
+    })
+  })
+
+  recom.MED.cycle <- apply(PEFF, 1, function(o){
+    cycles[which(o >= max(o) - proxy.thrd)[1]]
+  })
+
+  return(list(recom.MED.cycle = recom.MED.cycle))
 }
 
 

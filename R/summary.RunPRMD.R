@@ -2,19 +2,25 @@
 
 summary.RunPRMD <- function(object, ...){
 
-  #' Summary an RunPRMD object
+  #' Summary a RunPRMD object
   #'
-  #' Summary an RunPRMD object
+  #' Summary a RunPRMD object. Print the information of recommended dosage
+  #' selection along with the mean nTTP and the number of DLT for all doses and
+  #' cycles. Will print the mean efficacy for all doses and cycles when
+  #' implementing \code{\link{RunPRMD}} with option \code{effcy.flag = TRUE}. The
+  #' collected data is displayed in a human-readable table whose cell contain 3
+  #' values including observed nTTP, DLT, and dose assignment. The higher the
+  #' dose, the warmer the cell background color is. The black color of the
+  #' records indicates DLT equals 1.
   #'
   #' @param object RunPRMD object to summarise
   #' @param ... other arguments ignored (for compatibility with generic)
   #'
-  #' @return
-  #' \item{object}{The output of function \code{RunPRMD}}
-  #' \item{mnttp.M}{The mean nTTP for all doses and cycles}
-  #' \item{dlt.count.M}{The number of DLT for all doses and cycles}
-  #' \item{eff.M}{The mean efficacy for all doses and cycles. Return \code{NULL}
-  #' when \code{object$effcy.flag == TRUE}}
+  #' @return \item{object}{The output of function \code{RunPRMD}}
+  #'   \item{mnttp.M}{The mean nTTP for all doses and cycles}
+  #'   \item{dlt.count.M}{The number of DLT for all doses and cycles}
+  #'   \item{eff.M}{The mean efficacy for all doses and cycles. Return
+  #'   \code{NULL} when \code{object$effcy.flag == TRUE}}
   #'
   #' @export
   #'
@@ -58,7 +64,9 @@ print.summary.RunPRMD <- function(x, ...){
 
   #' Displays a useful description of a summary.RunPRMD object
   #'
-  #' Displays a useful description of a summary.RunPRMD object
+  #' Displays a useful description of a summary.RunPRMD object. Call by
+  #' \code{link{summary.RunPRMD}}. Check \code{link{summary.RunPRMD}} for the
+  #' details of the print information.
   #'
   #' @param x summary.RunPRMD object to summarise
   #' @param ... other arguments ignored (for compatibility with generic)
@@ -102,7 +110,7 @@ print.summary.RunPRMD <- function(x, ...){
     cat("\n The mean efficacy for all doses and cycles: \n")
     print(format(round(x$eff.M, 3), 3))
   }
-  cat("Recommend dose for new cohort: ", x$object$doseA, "\n")
+  cat("Recommended dose", x$object$doseA, "\n")
   cat("\nFor patients: \n", x$object$pat_rec$patID,
       "\non cycle: \n", x$object$pat_rec$cycle,
       "\nWe suggest dose levels: \n", x$object$pat_rec$dose, "\n")
@@ -121,9 +129,6 @@ print.summary.RunPRMD <- function(x, ...){
                             background = color.pal[as.numeric(strsplit(as.character(.), ",")[[1]])[3]])),
            cell_spec(., color = "white", background = "white"))
   ))%>%
-  # rowwise()%>%
-  #   mutate_at(vars(starts_with("cycle")), funs(format(round(as.numeric(unlist(
-  #     strsplit(as.character(.), ","))[1]), 3), 3)))%>%
   select(PatID, starts_with("cycle"))%>%
   kable(escape = F, format = "html") %>%
   kable_styling() %>%
@@ -133,14 +138,15 @@ print.summary.RunPRMD <- function(x, ...){
 
 plot.RunPRMD <- function(x, ..., select_cycle = x$cycles){
 
-  #' nTTP and efficacy boxplots of a RunPRMD object
+  #' Plot nTTP and efficacy boxplots of a RunPRMD object
   #'
-  #' nTTP and efficacy boxplots of a RunPRMD object
+  #' Plot nTTP boxplots of a RunPRMD object. Plot efficacy boxplots when
+  #' implementing \code{RunPRMD} with option \code{effcy.flag == TRUE}.
   #'
   #' @param x RunPRMD object to summarise
   #' @param ... other arguments ignored (for compatibility with generic)
-  #' @param select_cycle A vector indication the cycle in the boxplot.
-  #' Default is \code{cycle} of \code{x}.
+  #' @param select_cycle A vector indication the cycle in the boxplot. Default
+  #'   is \code{cycle} of \code{x}.
   #'
   #' @examples
   #' ## Check ?RunPRMD for example
@@ -178,13 +184,24 @@ plot.RunPRMD <- function(x, ..., select_cycle = x$cycles){
 
 patlist.display <- function(patlist, n.dose, n.cycle){
 
-  #' Display a patient records
+  #' Display patient records
   #'
-  #' @param patlist The patient records
+  #' Display patient records in a human-readable table. Each cell contains 3
+  #' values including observed nTTP, DLT, and dose assignment. The higher the
+  #' dose, the warmer the cell background color is. The black color of the
+  #' records indicates DLT equals 1.
+  #'
+  #' @param patlist A list of the patient treatment records, which must contains
+  #'   the following variables: \describe{ \item{PatID}{denotes the patient ID
+  #'   where the elements are specified by cohort and subject number. For
+  #'   example, "cohort2subject3" denotes the third subject in the second
+  #'   cohort} \item{dose}{records the dose level assigned for each patient
+  #'   through the whole treatment} \item{cycle}{shows the treatment cycle
+  #'   information of each record} \item{nTTP}{records the corresponding nTTP
+  #'   score.} \item{dlt}{indicates whether a DLT event is observed or not?}}
   #' @param n.dose  The number of dose in the study
   #' @param n.cycle The number of cycle in the study
   #'
-  #' @return
   #' @import RColorBrewer
   #' @importFrom dplyr mutate rowwise mutate_at starts_with select funs vars
   #' @import kableExtra
@@ -192,6 +209,8 @@ patlist.display <- function(patlist, n.dose, n.cycle){
   #' @importFrom utils capture.output
   #' @export
   #'
+
+
 
   color.pal <- brewer.pal(n = n.dose, name = "RdYlGn")[n.dose:1]
   l <- length(patlist$PatID)
@@ -224,9 +243,6 @@ patlist.display <- function(patlist, n.dose, n.cycle){
                                 background = color.pal[as.numeric(strsplit(as.character(.), ",")[[1]])[3]])),
                cell_spec(., color = "white", background = "white"))
       ))%>%
-      # rowwise()%>%
-      #   mutate_at(vars(starts_with("cycle")), funs(format(round(as.numeric(unlist(
-      #     strsplit(as.character(.), ","))[1]), 3), 3)))%>%
       select(PatID, starts_with("cycle"))%>%
       kable(escape = F, format = "html") %>%
       kable_styling() %>%

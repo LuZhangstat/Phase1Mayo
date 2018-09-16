@@ -2,7 +2,8 @@
 % Please edit documentation in R/eff_summary.R
 \name{eff_suggest}
 \alias{eff_suggest}
-\title{Suggest the input \code{eff.structure} of function \code{SimPRMD}}
+\title{Suggest the input \code{eff.structure} of function \code{SimPRMD} with
+selected \code{eff.sd_tran}}
 \usage{
 eff_suggest(eff.M, eff.sd, eff.sd_trans, n.sim = 30000)
 }
@@ -10,20 +11,23 @@ eff_suggest(eff.M, eff.sd, eff.sd_trans, n.sim = 30000)
 \item{eff.M}{The efficacy mean matrix whose (i,j)th element save the
 target mean of the efficacy data}
 
-\item{eff.sd}{The target standard deviation of efficacy data}
+\item{eff.sd}{The target standard deviation matrix for all dose and
+cycles. Notice that the generated efficacy may have different standard
+deviation matrix due to the correlations across cycles}
 
-\item{eff.sd_trans}{The eff.sd_trans for test}
+\item{eff.sd_trans}{The eff.sd_trans for test. Notice variance of the
+generated efficacy data will be effected by \code{eff.sd_trans}.}
 
 \item{n.sim}{The number of simulations for the numerical calculation in
 the function. The default is 30,000}
 }
 \value{
-\item{eff.suggest}{The matrix suggested for the input \code{eff.structure} of
-function \code{SimPRMD}}
+\item{eff.suggest}{The matrix suggested for the input
+  \code{eff.structure} of function \code{SimPRMD}}
 }
 \description{
-Suggest the input \code{eff.structure} with selected \code{eff.sd_tran}
-of function SimPRMD for given efficacy mean matrix and efficacy standard
+Suggest the input \code{eff.structure} of function SimPRMD  with selected
+\code{eff.sd_tran} for given efficacy mean matrix and efficacy standard
 deviation
 }
 \examples{
@@ -42,14 +46,16 @@ eff.structure <- eff_suggest(eff.M = eff.M, eff.sd = eff.sd,
                              eff.sd_trans = eff.sd_trans)
 
 # check whether the suggested eff.M and the selected sd_trans
-# generate the desirable senerio
+# generate the desirable scenario
 eff.Sigma <- diag(6)
 diag(eff.Sigma[-1,]) = 0.5
 diag(eff.Sigma[, -1]) = 0.5
 eff.check <- eff_summary(eff.structure = eff.structure,
                          eff.Sigma = eff.Sigma,
-                         eff.sd_trans = eff.sd_trans)
+                         eff.sd_trans = eff.sd_trans,
+                         plot.flag = TRUE)
 eff.check$eff.M
 eff.check$eff.cor.ls
+
 
 }
