@@ -208,8 +208,6 @@ patlist.display <- function(patlist, n.dose, n.cycle){
   #' @import knitr
   #' @importFrom utils capture.output
   #' @export
-  #'
-
 
 
   color.pal <- brewer.pal(n = n.dose, name = "RdYlGn")[n.dose:1]
