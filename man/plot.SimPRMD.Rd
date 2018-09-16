@@ -16,7 +16,7 @@
 \description{
 Plot the predictive probability of nTTP < target toxicity for all cycles
 and doses , the mean nTTP vs cycle1 and cycle > 2 for all doses of a
-SimPRMD object. Plot median treadment duration boxplot along with the DLT
+SimPRMD object. Plot median treatment duration boxplot along with the DLT
 drop off rate when implementing \code{\link{SimPRMD}} with option
 \code{DLT.drop.flag = TRUE}.
 }

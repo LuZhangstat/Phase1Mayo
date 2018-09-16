@@ -13,7 +13,7 @@ nTTP_summary <- function(Tox.prob.M, nTTP.all, wm) {
   #'   See more details about how to generate toxicity probability matrices in
   #'   the help document of \code{\link[phase1RMD]{GenToxProb}}.
   #' @param nTTP.all The output of \code{\link{nTTP.array}}
-  #' @param wm      (numerical matric) Toxicity weighted matrix, with row be the
+  #' @param wm      (numerical matrix) Toxicity weighted matrix, with row be the
   #'   type of the toxicity and column be the toxicity grade
   #'
   #' @return \item{mnTTP.M}{matrix of mean nTTP for all doses and cycles}

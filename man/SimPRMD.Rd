@@ -68,7 +68,7 @@ one among the safe doses will be declared an efficacious dose.}
 probabilities of the occurrences of certain grades for certain types of
 toxicities, at each dose level and cycle under consideration. Dimension 1
 refers to doses; dimension 2 corresponds to cycles of the treatment;
-dimension 3 regards the types of toxicities while dimenion 4 relates to
+dimension 3 regards the types of toxicities while dimension 4 relates to
 grades. If null, which is default choice, the arguments toxtype,
 intercept.alpha, coef.beta, cycle.gamma must be provided to simulate this
 array.}
@@ -198,7 +198,7 @@ The user can simulation efficacy response with different
   \code{eff.structure} and \code{eff.Sigma}, respectively. Define
   \eqn{\phi} be the density of \eqn{N(0, \sigma^2)} with CDF \eqn{\Phi},
   and \eqn{\sigma^2} is set by \code{eff.sd_trans}. Then the efficacy
-  reponse is calculated by taking the CDF of \eqn{z}: \deqn{x={x1, \ldots,
+  response is calculated by taking the CDF of \eqn{z}: \deqn{x={x1, \ldots,
   xd} = \Phi(z) = { \Phi(z1), \ldots, \Phi(zd)}} is the generated efficacy
   response. Notice here the variance parameter \eqn{\sigma^2_{trans}}
   controls the variance of the generated efficacy.

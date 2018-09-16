@@ -16,7 +16,7 @@ the help document of \code{\link[phase1RMD]{GenToxProb}}.}
 
 \item{nTTP.all}{The output of \code{\link{nTTP.array}}}
 
-\item{wm}{(numerical matric) Toxicity weighted matrix, with row be the
+\item{wm}{(numerical matrix) Toxicity weighted matrix, with row be the
 type of the toxicity and column be the toxicity grade}
 }
 \value{

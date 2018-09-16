@@ -26,7 +26,7 @@ Default is 300,000}
 
 \item{seed}{The seed of R's random number generator. Default is 123}
 
-\item{plot.flag}{Whether output the mariginal density, and correlation
+\item{plot.flag}{Whether output the marginal density, and correlation
 matrix or not. Default is FALSE.}
 
 \item{plot.title}{Whether display the title of the plot or not. Default is

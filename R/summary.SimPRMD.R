@@ -19,7 +19,7 @@ summary.SimPRMD <- function(object, ...){
   #' \item{cs_dlt.rt}{Subsequent cycle (cycle > 1) dlt rate}
   #' \item{alloc.perc}{Dose allocation of cycle 1}
   #' \item{sbsq.alloc}{Dose allocation of subsequent cycles (cycle > 1)}
-  #' \item{rec.prec}{The precentage of Recommended doses for cycle 1}
+  #' \item{rec.prec}{The percentage of Recommended doses for cycle 1}
   #' \item{effcy.flag}{Argument \code{effcy.flag} of function \code{SimPRMD}}
   #' \item{DLT.drop.flag}{Argument \code{DLT.drop.flag} of function
   #' \code{SimPRMD}}
@@ -165,7 +165,7 @@ plot.SimPRMD <- function(x, ..., title.add = TRUE){
   #'
   #' Plot the predictive probability of nTTP < target toxicity for all cycles
   #' and doses , the mean nTTP vs cycle1 and cycle > 2 for all doses of a
-  #' SimPRMD object. Plot median treadment duration boxplot along with the DLT
+  #' SimPRMD object. Plot median treatment duration boxplot along with the DLT
   #' drop off rate when implementing \code{\link{SimPRMD}} with option
   #' \code{DLT.drop.flag = TRUE}.
   #'

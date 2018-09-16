@@ -22,7 +22,7 @@ eff_summary <- function(eff.structure, eff.Sigma, eff.sd_trans, n.sim = 300000,
   #' @param n.sim Number of simulations for calculation summary statistics.
   #'   Default is 300,000
   #' @param seed 	The seed of R's random number generator. Default is 123
-  #' @param plot.flag Whether output the mariginal density, and correlation
+  #' @param plot.flag Whether output the marginal density, and correlation
   #'   matrix or not. Default is FALSE.
   #' @param plot.title Whether display the title of the plot or not. Default is
   #'   TRUE

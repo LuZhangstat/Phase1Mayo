@@ -128,7 +128,7 @@ RunPRMD <-function(seed = 1234, patlist, patID_act = NULL,
   #'   recommended dose level for cycle 1 for new cohorts} \item{pat_rec}{The
   #'   recommended dose for current patients for next cycle}
   #'   \item{effcy.flag}{The input argument \code{effcy.flag}} \item{doses}{The
-  #'   input argument \code{doses}} \item{cycles}{The inpur argument
+  #'   input argument \code{doses}} \item{cycles}{The input argument
   #'   \code{cycles}}
   #'
   #' @details The RunPRMD function implement a Multi-Stage Phase I Dose--Finding
