@@ -5,9 +5,9 @@ Title: Personalized Repeated Measurement Design for Phase I Clinical Trials
 Version: 0.1.0
 Author: Lu Zhang, Jun Yin
 Maintainer: Jun Yin <vivien.jyin@gmail.com>
-Description:  Implements our Bayesian phase I repeated measurement design that 
+Description:  Implements Bayesian phase I repeated measurement design that 
     accounts for multidimensional toxicity endpoints and longitudinal efficacy 
-    measure from multiple treatment cycles. The package also provides flags to 
+    measure from multiple treatment cycles. The package provides flags to 
     fit a variety of model-based phase I design, including 1 stage models with
     or without individualized dose modification, 3-stage models with or without
     individualized dose modification, etc. Functions are provided to recommend 
