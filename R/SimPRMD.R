@@ -218,10 +218,10 @@ SimPRMD <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
   #'
   #'
   #' #------- a flat dose-toxicity, dose-efficacy, cycle-efficacy pattern------#
-  #' simul1 <- SimPRMD(numTrials = 1, tox.matrix = tox.matrix,
-  #'                   eff.structure = eff.structure, eff.Sigma = eff.Sigma,
-  #'                   eff.sd_trans = eff.sd_trans, wm = wm, toxmax = toxmax,
-  #'                   trialSize = 12)
+  #' # simul1 <- SimPRMD(numTrials = 1, tox.matrix = tox.matrix,
+  #' #                   eff.structure = eff.structure, eff.Sigma = eff.Sigma,
+  #' #                   eff.sd_trans = eff.sd_trans, wm = wm, toxmax = toxmax,
+  #' #                   trialSize = 36)
   #'
   #' #------- a flat dose-toxicity pattern model ------#
   #' # simul2 <- SimPRMD(numTrials = 1, toxtype = c("H", "L", "M"),
