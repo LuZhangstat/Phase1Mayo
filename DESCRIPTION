@@ -23,7 +23,6 @@ Imports:
     arrayhelpers,
     phase1RMD,
     rjags (>= 4.1.0),
-    R2WinBUGS,
     coda,
     MASS,
     ggplot2,
@@ -35,5 +34,5 @@ Imports:
     kableExtra,
     knitr
 RoxygenNote: 6.1.0
-Suggests:
+Suggests: 
 License: GPL (>= 2)

@@ -50,7 +50,7 @@ eff_summary <- function(eff.structure, eff.Sigma, eff.sd_trans, n.sim = 300000,
   #' level}
   #'
   #' @examples
-  #' data(eff)       # load eff.RData from package phase1PRMD. Details see "?eff"
+  #' data("eff")       # load eff.RData from package phase1PRMD. Details see "?eff"
   #' eff.structure = eff$Dose_Cycle_Meff["plat", "dec", , ]
   #' eff.Sigma = eff$Sigma
   #' eff.sd_trans = eff$sd_trans
@@ -102,17 +102,22 @@ eff_summary <- function(eff.structure, eff.Sigma, eff.sd_trans, n.sim = 300000,
                                        labels = paste("cycle", 1:n.cycles))
       # plot the efficacy density and correlation matrix
       pd <- ggplot() +
-        geom_density(aes(x = eff, color = cycle, linetype = cycle, fill = cycle),
+        geom_density(aes(x = dose_cycle_eff_d$eff, color = cycle,
+                         linetype = cycle, fill = cycle),
                      data = dose_cycle_eff_d, alpha = 0.3) + theme_bw() +
         theme(axis.title.x = element_blank(), axis.title.y = element_blank())
-      pc <- ggplot(data = cormat.ls[[d]], aes(Var1, Var2, fill = value))+
+      pc <- ggplot(data = cormat.ls[[d]], aes(cormat.ls[[d]]$Var1,
+                                              cormat.ls[[d]]$Var2,
+                                              fill = cormat.ls[[d]]$value))+
         geom_tile(color = "white") +
         scale_fill_gradient2(low = "blue", high = "purple", mid = "white",
                              midpoint = 0, limit = c(-1, 1), space = "Lab",
                              name = element_blank()) +
         theme_minimal()+ # minimal theme
         coord_fixed() +
-        geom_text(aes(Var1, Var2, label = value), color = "black", size = 3) +
+        geom_text(aes(cormat.ls[[d]]$Var1, cormat.ls[[d]]$Var2,
+                      label = cormat.ls[[d]]$value), color = "black",
+                  size = 3) +
         theme(
           axis.title.x = element_blank(),
           axis.text.x = element_blank(),

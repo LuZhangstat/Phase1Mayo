@@ -233,8 +233,8 @@ The user can simulate longitudinal efficacy response with
 }
 \examples{
 
-data(prob)      # load prob.RData from package phaseI, Details see "?prob"
-data(eff)       # load eff.RData from package phaseI. Details see "?eff"
+data("prob")      # load prob.RData from package phaseI, Details see "?prob"
+data("eff")       # load eff.RData from package phaseI. Details see "?eff"
 
 eff.structure = eff$Dose_Cycle_Meff[2, 2, , ]
 eff.Sigma = eff$Sigma
@@ -251,9 +251,10 @@ tox.matrix <- prob["MTD4", "flat", , , , ]
 
 
 #------- a flat dose-toxicity, dose-efficacy, cycle-efficacy pattern------#
-# simul1 <- SimPRMD(numTrials = 1, tox.matrix = tox.matrix,
-#                   eff.structure = eff.structure, eff.Sigma = eff.Sigma,
-#                   eff.sd_trans = eff.sd_trans, wm = wm, toxmax = toxmax)
+simul1 <- SimPRMD(numTrials = 1, tox.matrix = tox.matrix,
+                  eff.structure = eff.structure, eff.Sigma = eff.Sigma,
+                  eff.sd_trans = eff.sd_trans, wm = wm, toxmax = toxmax,
+                  trialSize = 12)
 
 #------- a flat dose-toxicity pattern model ------#
 # simul2 <- SimPRMD(numTrials = 1, toxtype = c("H", "L", "M"),

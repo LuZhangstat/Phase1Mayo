@@ -64,7 +64,7 @@ The user can simulate longitudinal efficacy response with
   efficacy.
 }
 \examples{
-data(eff)       # load eff.RData from package phase1PRMD. Details see "?eff"
+data("eff")       # load eff.RData from package phase1PRMD. Details see "?eff"
 eff.structure = eff$Dose_Cycle_Meff["plat", "dec", , ]
 eff.Sigma = eff$Sigma
 eff.sd_trans = eff$sd_trans

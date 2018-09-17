@@ -202,12 +202,14 @@ plot.SimPRMD <- function(x, ..., title.add = TRUE){
   ppnttp.sm <- summarySE(ppnttp.dt, measurevar="ppnttp.d",
                          groupvars=c("cycle", "dose"))
   pd <- position_dodge(0.6)
-  pp <- ggplot(ppnttp.sm, aes(x = cycle, y = ppnttp.d, group = dose,
-                        colour = dose)) +
-    geom_errorbar(aes(ymin = q.2.5, ymax = q.97.5), width = .4,
-                  position = pd) +
-    geom_line(position = pd, aes(linetype = dose)) +
-    geom_point(position = pd, aes(shape = dose), size = 3, fill = "white") +
+  pp <- ggplot(ppnttp.sm, aes(x = ppnttp.sm$cycle, y = ppnttp.sm$ppnttp.d,
+                              group = ppnttp.sm$dose,
+                              colour = ppnttp.sm$dose)) +
+    geom_errorbar(aes(ymin = ppnttp.sm$q.2.5, ymax = ppnttp.sm$q.97.5),
+                  width = .4, position = pd) +
+    geom_line(position = pd, aes(linetype = ppnttp.sm$dose)) +
+    geom_point(position = pd, aes(shape = ppnttp.sm$dose), size = 3,
+               fill = "white") +
     scale_y_continuous(limits = c(0.0, 1.0))
 
   if(title.add == T){
@@ -226,7 +228,7 @@ plot.SimPRMD <- function(x, ..., title.add = TRUE){
       nttp.dt <- data.frame(nttp.c = a$patlist$nTTP[
         which(a$patlist$cycle == cyc)],
         do.c = a$patlist$dose[which(a$patlist$cycle == cyc)])
-      dt <- ddply(nttp.dt, ~do.c, summarise, mean = mean(nttp.c))
+      dt <- ddply(nttp.dt, ~do.c, summarise, mean = mean(nttp.dt$nttp.c))
       return(dt)
       }))
     } else {
@@ -234,25 +236,26 @@ plot.SimPRMD <- function(x, ..., title.add = TRUE){
       nttp.dt <- data.frame(nttp.c = a$patlist$nTTP[
         which(a$patlist$cycle >= cyc)],
         do.c = a$patlist$dose[which(a$patlist$cycle >= cyc)])
-      dt <- ddply(nttp.dt, ~do.c, summarise, mean = mean(nttp.c))
+      dt <- ddply(nttp.dt, ~do.c, summarise, mean = mean(nttp.dt$nttp.c))
       return(dt)
       }))
     }
   }
-  m.nttp.dt <- data.frame(m.nttp = unlist(m.nttp.c.ls)[which(unlist(m.nttp.c.ls)< 1)],
-                          dose = factor(
-                            unlist(m.nttp.c.ls)[which(unlist(m.nttp.c.ls) >= 1)],
-                            levels = x$doses),
-                          group = c(rep("c 1", length(which(m.nttp.c.ls[[1]] < 1))),
-                                    rep("c >1", length(which(m.nttp.c.ls[[2]] < 1)))))
+  m.nttp.dt <- data.frame(m.nttp = unlist(m.nttp.c.ls)[
+    which(unlist(m.nttp.c.ls)< 1)],
+    dose = factor(unlist(m.nttp.c.ls)[which(unlist(m.nttp.c.ls) >= 1)],
+                        levels = x$doses),
+    group = c(rep("c 1", length(which(m.nttp.c.ls[[1]] < 1))),
+              rep("c >1", length(which(m.nttp.c.ls[[2]] < 1)))))
 
   tgc <- summarySE(m.nttp.dt, measurevar="m.nttp", groupvars=c("group","dose"))
   pd <- position_dodge(0.4)
-  p1 <- ggplot(tgc, aes(x = dose, y = m.nttp, group = group,
-                        colour = group)) +
-    geom_errorbar(aes(ymin=q.2.5, ymax=q.97.5), width=.4,
-                  position=pd) + geom_line(position=pd, aes(linetype = group)) +
-    geom_point(position=pd, aes(shape=group), size = 3, fill = "white") +
+  p1 <- ggplot(tgc, aes(x = tgc$dose, y = tgc$m.nttp, group = tgc$group,
+                        colour = tgc$group)) +
+    geom_errorbar(aes(ymin=tgc$q.2.5, ymax=tgc$q.97.5), width=.4,
+                  position=pd) +
+    geom_line(position=pd, aes(linetype = tgc$group)) +
+    geom_point(position=pd, aes(shape = tgc$group), size = 3, fill = "white") +
     scale_y_continuous(limits = c(0.0, 0.85))
 
   if(title.add == T){
@@ -280,12 +283,15 @@ plot.SimPRMD <- function(x, ..., title.add = TRUE){
     cycle_data <- data.frame(perc = cycle_prec, cycle = x$cycles)
     surv_data <- data.frame(surv_dur = surv_dur)
 
-    cycle_p_g <- ggplot(cycle_data, aes(x = cycle, y = perc)) +
+    cycle_p_g <- ggplot(cycle_data,
+                        aes(x = cycle_data$cycle, y = cycle_data$perc)) +
       geom_bar(stat = "identity", width = 0.3, color = "cadetblue4",
                fill = "azure2", size = 0.5) +
       geom_line(color = "cadetblue4", size = 1) +
       xlab("cycle") + ylab("percentage of safe patients") +
-      geom_text(aes(label = paste0(sprintf("%0.2f", round(100*perc, 2)), "%")),
+      geom_text(aes(label = paste0(sprintf("%0.2f",
+                                           round(100*cycle_data$perc, 2)),
+                                   "%")),
                 hjust = 0.5, vjust = -1) +
       theme(plot.margin = margin(0, 0, 0, 0, "cm")) +
       scale_x_continuous(minor_breaks = 1, limits = c(0.5, n.cycles + 0.5),
@@ -294,7 +300,7 @@ plot.SimPRMD <- function(x, ..., title.add = TRUE){
       scale_y_continuous(limits = c(0, 1), breaks =  seq(0, 1, 0.25),
                          labels = paste0(seq(0, 100, 25), "%"))
 
-    surv_dur_box <- ggplot(surv_data, aes(x = "100%", y = surv_dur)) +
+    surv_dur_box <- ggplot(surv_data, aes(x = "100%", y = surv_data$surv_dur)) +
       geom_boxplot( color = "cadetblue4", fill = "azure2", size = 1) +
       coord_flip() +
       theme(axis.title.x=element_blank(), axis.text.x=element_blank(),

@@ -22,7 +22,7 @@ nTTP_summary <- function(Tox.prob.M, nTTP.all, wm) {
   #'
   #' @examples
   #'
-  #' data(prob)
+  #' data("prob")
   #'
   #' wm <- matrix(c(0, 0.5, 0.75, 1, 1.5,
   #'                0, 0.5, 0.75, 1, 1.5,

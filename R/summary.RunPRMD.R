@@ -78,6 +78,8 @@ print.summary.RunPRMD <- function(x, ...){
   #' @importFrom utils capture.output
   #' @export
 
+  . <- NULL; PatID <- NULL # for suppressing the note in checking
+
   if (!inherits(x, "summary.RunPRMD"))
     stop(gettextf("'x' must inherit from class %s",
                   dQuote("summary.RunPRMD")),
@@ -162,7 +164,8 @@ plot.RunPRMD <- function(x, ..., select_cycle = x$cycles){
     nTTP = as.vector(x$patlist$nTTP[select.index]),
     cycle = factor(x$patlist$cycle[select.index], levels = select_cycle),
     dose = factor(x$patlist$dose[select.index], levels = x$doses))
-  pnTTP <- ggplot(data = nttp.dt, aes(x = dose, y = nTTP, fill = cycle)) +
+  pnTTP <- ggplot(data = nttp.dt, aes(x = nttp.dt$dose, y = nttp.dt$nTTP,
+                                      fill = nttp.dt$cycle)) +
     stat_boxplot(geom ='errorbar', width = 0.5) + geom_boxplot() +
     facet_wrap(~cycle) + xlab("Doses") + ylab("nTTP")
     scale_x_discrete(breaks = x$doses, labels = x$doses)
@@ -173,7 +176,8 @@ plot.RunPRMD <- function(x, ..., select_cycle = x$cycles){
       effcy = as.vector(x$patlist$efficacy[select.index]),
       cycle = factor(x$patlist$cycle[select.index], levels = select_cycle),
       dose = factor(x$patlist$dose[select.index], levels = x$doses))
-    peff <- ggplot(data = effcy.dt, aes(x = dose, y = effcy, fill = cycle)) +
+    peff <- ggplot(data = effcy.dt, aes(x = effcy.dt$dose, y = effcy.dt$effcy,
+                                        fill = effcy.dt$cycle)) +
       stat_boxplot(geom ='errorbar', width = 0.5) + geom_boxplot() +
       facet_wrap(~cycle) + xlab("Doses") + ylab("Efficacy")
       scale_x_discrete(breaks = x$doses, labels = x$doses)
@@ -202,13 +206,14 @@ patlist.display <- function(patlist, n.dose, n.cycle){
   #' @param n.dose  The number of dose in the study
   #' @param n.cycle The number of cycle in the study
   #'
-  #' @import RColorBrewer
+  #' @importFrom RColorBrewer brewer.pal
   #' @importFrom dplyr mutate rowwise mutate_at starts_with select funs vars
   #' @import kableExtra
   #' @import knitr
   #' @importFrom utils capture.output
   #' @export
 
+  . <- NULL; PatID <- NULL # for suppressing the note
 
   color.pal <- brewer.pal(n = n.dose, name = "RdYlGn")[n.dose:1]
   l <- length(patlist$PatID)
@@ -236,15 +241,17 @@ patlist.display <- function(patlist, n.dose, n.cycle){
         ifelse(!is.na(.),
                ifelse(as.numeric(unlist(strsplit(as.character(.), ","))[2]) == 0,
                       cell_spec(., color = "white", bold = T,
-                                background = color.pal[as.numeric(strsplit(as.character(.), ",")[[1]])[3]]),
+                                background = color.pal[
+                                  as.numeric(strsplit(as.character(.), ",")[[1]])[3]]),
                       cell_spec(., color = "black", bold = T,
-                                background = color.pal[as.numeric(strsplit(as.character(.), ",")[[1]])[3]])),
+                                background = color.pal[
+                                  as.numeric(strsplit(as.character(.), ",")[[1]])[3]])),
                cell_spec(., color = "white", background = "white"))
       ))%>%
       select(PatID, starts_with("cycle"))%>%
       kable(escape = F, format = "html") %>%
       kable_styling() %>%
       footnote((general = "the entries in each cell are formatted in: nTTP, dlt, dose"))
-  )))
+    )))
 }
 

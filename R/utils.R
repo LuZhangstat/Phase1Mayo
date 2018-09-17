@@ -126,7 +126,7 @@ phase1stage1 <- function(patlist, ctrl_param, n.iters = 5000, burn.in = 5000,
   ## n.chains:       number of MCMC chains in the fitting, default = 1
   ## dose_flag:      when dose_flag equals 1, we need to degenerate design matrix
   ## return: return the posterior samples of the MCMC chain
-  #' @import R2WinBUGS
+  ## @import R2WinBUGS
   #' @import rjags
   #' @importFrom stats runif update
   #' @importFrom utils modifyList
@@ -144,20 +144,20 @@ phase1stage1 <- function(patlist, ctrl_param, n.iters = 5000, burn.in = 5000,
   W_y[cbind(1:n, as.numeric(sapply(patlist$PatID, function(a) {
     which(a == uniq_ID)})))] <- 1
 
-  model.file <- function() {
-    beta <- c(beta_other[], beta_dose)
-    for (i in 1:N1) {
-      y[i] ~ dnorm(mu[i], tau_e)
-      mu[i] <- inprod(X_y[i, ], beta) + inprod(W_y[i, ], gamma)
-    }
-    for (j in 1:N2) {
-      gamma[j] ~ dnorm(0, tau_g)
-    }
-    beta_other ~ dmnorm(p1_beta_other[], p2_beta_other[, ])
-    beta_dose ~ dunif(p1_beta_dose, p2_beta_dose)
-    tau_e ~ dunif(p1_tau_e, p2_tau_e)           ## variance of nTTP
-    tau_g ~ dunif(p1_tau_g, p2_tau_g)           ## variance of random effect
-  }
+  # model.file <- function() {
+  #   beta <- c(beta_other[], beta_dose)
+  #   for (i in 1:N1) {
+  #     y[i] ~ dnorm(mu[i], tau_e)
+  #     mu[i] <- inprod(X_y[i, ], beta) + inprod(W_y[i, ], gamma)
+  #   }
+  #   for (j in 1:N2) {
+  #     gamma[j] ~ dnorm(0, tau_g)
+  #   }
+  #   beta_other ~ dmnorm(p1_beta_other[], p2_beta_other[, ])
+  #   beta_dose ~ dunif(p1_beta_dose, p2_beta_dose)
+  #   tau_e ~ dunif(p1_tau_e, p2_tau_e)           ## variance of nTTP
+  #   tau_g ~ dunif(p1_tau_g, p2_tau_g)           ## variance of random effect
+  # }
 
   mydata <- list(N1 = n, N2 = n.subj, y = patlist$nTTP,
                  X_y = X_y, W_y = W_y,
@@ -182,7 +182,26 @@ phase1stage1 <- function(patlist, ctrl_param, n.iters = 5000, burn.in = 5000,
                  p2_tau_g = 1000)
 
   path.model <- file.path(tempdir(), "model.file.txt")
-  R2WinBUGS::write.model(model.file, path.model)
+
+  sink(path.model)
+  cat("model
+      {
+      beta <- c(beta_other[], beta_dose)
+      for (i in 1:N1) {
+      y[i] ~ dnorm(mu[i], tau_e)
+      mu[i] <- inprod(X_y[i, ], beta) + inprod(W_y[i, ], gamma)
+      }
+      for (j in 1:N2) {
+      gamma[j] ~ dnorm(0, tau_g)
+      }
+      beta_other ~ dmnorm(p1_beta_other[], p2_beta_other[, ])
+      beta_dose ~ dunif(p1_beta_dose, p2_beta_dose)
+      tau_e ~ dunif(p1_tau_e, p2_tau_e)           ## variance of nTTP
+      tau_g ~ dunif(p1_tau_g, p2_tau_g)           ## variance of random effect
+      }",fill = TRUE)
+  sink()
+
+  #R2WinBUGS::write.model(model.file, path.model)
   inits.list <- list(list(beta_other = rep(0.1, ifelse(dose_flag == 1, 1, 2)),
                           beta_dose = 0.1, tau_e = 0.1, tau_g = 0.1,
                           .RNG.seed = ceiling(runif(1) * 1e+08),
@@ -226,7 +245,7 @@ phase1stage2 <- function(patlist, ctrl_param, n.iters = 5000, burn.in = 5000,
   ## n.chains:       number of MCMC chains in the fitting, default is 1
   ## dose_flag:      when dose_flag equals 1, we need to degenerate design matrix
   ## return:         return the posterior samples of the MCMC chain
-  #' @import R2WinBUGS
+  ## @import R2WinBUGS
   #' @import rjags
   #' @importFrom stats runif update
   #' @importFrom utils modifyList
@@ -253,28 +272,28 @@ phase1stage2 <- function(patlist, ctrl_param, n.iters = 5000, burn.in = 5000,
                patlist$cycle[eff.ind])
   ## design matrix of efficacy
 
-  model.file <- function() {
-    beta <- c(beta_other[], beta_dose)
-    for (i in 1:N1) {
-      y[i] ~ dnorm(mu[i], tau_e)
-      mu[i] <- inprod(X_y[i, ], beta) + inprod(W_y[i, ], gamma)
-    }
-    for (j in 1:N2) {
-      gamma[j] ~ dnorm(0, tau_g)
-    }
-    for (k in 1:N3) {
-      y_e[k] ~ dnorm(mu_e[k], tau_f)
-      mu_e[k] <- inprod(X_e[k, ], alpha) + rho * gamma[keepeff.ind[k]]
-    }
-
-    beta_other ~ dmnorm(p1_beta_other[], p2_beta_other[, ])
-    beta_dose ~ dunif(p1_beta_dose, p2_beta_dose)
-    alpha ~ dmnorm(p1_alpha[], p2_alpha[, ])
-    rho ~ dnorm(p1_rho, p2_rho)            ## covariance of nTTP and efficacy
-    tau_e ~ dunif(p1_tau_e, p2_tau_e)      ## variance of nTTP
-    tau_g ~ dunif(p1_tau_g, p2_tau_g)      ## variance of gamma
-    tau_f ~ dunif(p1_tau_f, p2_tau_f)      ## variance of efficacy
-  }
+  # model.file <- function() {
+  #   beta <- c(beta_other[], beta_dose)
+  #   for (i in 1:N1) {
+  #     y[i] ~ dnorm(mu[i], tau_e)
+  #     mu[i] <- inprod(X_y[i, ], beta) + inprod(W_y[i, ], gamma)
+  #   }
+  #   for (j in 1:N2) {
+  #     gamma[j] ~ dnorm(0, tau_g)
+  #   }
+  #   for (k in 1:N3) {
+  #     y_e[k] ~ dnorm(mu_e[k], tau_f)
+  #     mu_e[k] <- inprod(X_e[k, ], alpha) + rho * gamma[keepeff.ind[k]]
+  #   }
+  #
+  #   beta_other ~ dmnorm(p1_beta_other[], p2_beta_other[, ])
+  #   beta_dose ~ dunif(p1_beta_dose, p2_beta_dose)
+  #   alpha ~ dmnorm(p1_alpha[], p2_alpha[, ])
+  #   rho ~ dnorm(p1_rho, p2_rho)            ## covariance of nTTP and efficacy
+  #   tau_e ~ dunif(p1_tau_e, p2_tau_e)      ## variance of nTTP
+  #   tau_g ~ dunif(p1_tau_g, p2_tau_g)      ## variance of gamma
+  #   tau_f ~ dunif(p1_tau_f, p2_tau_f)      ## variance of efficacy
+  # }
 
   mydata <- list(N1 = n, N2 = n.subj, N3 = n.eff,
                  y = patlist$nTTP, X_y = X_y, W_y = W_y,
@@ -307,7 +326,32 @@ phase1stage2 <- function(patlist, ctrl_param, n.iters = 5000, burn.in = 5000,
                  keepeff.ind = keepeff.ind)
 
   path.model <- file.path(tempdir(), "model.file.txt")
-  R2WinBUGS::write.model(model.file, path.model)
+  sink(path.model)
+  cat("model
+      {
+      beta <- c(beta_other[], beta_dose)
+      for (i in 1:N1) {
+      y[i] ~ dnorm(mu[i], tau_e)
+      mu[i] <- inprod(X_y[i, ], beta) + inprod(W_y[i, ], gamma)
+      }
+      for (j in 1:N2) {
+      gamma[j] ~ dnorm(0, tau_g)
+      }
+      for (k in 1:N3) {
+      y_e[k] ~ dnorm(mu_e[k], tau_f)
+      mu_e[k] <- inprod(X_e[k, ], alpha) + rho * gamma[keepeff.ind[k]]
+      }
+
+      beta_other ~ dmnorm(p1_beta_other[], p2_beta_other[, ])
+      beta_dose ~ dunif(p1_beta_dose, p2_beta_dose)
+      alpha ~ dmnorm(p1_alpha[], p2_alpha[, ])
+      rho ~ dnorm(p1_rho, p2_rho)            ## covariance of nTTP and efficacy
+      tau_e ~ dunif(p1_tau_e, p2_tau_e)      ## variance of nTTP
+      tau_g ~ dunif(p1_tau_g, p2_tau_g)      ## variance of gamma
+      tau_f ~ dunif(p1_tau_f, p2_tau_f)      ## variance of efficacy
+      }",fill = TRUE)
+  sink()
+  #R2WinBUGS::write.model(model.file, path.model)
   inits.list <- list(list(beta_other = c(0.1, 0.1), beta_dose = 0.1,
                           alpha = c(0.1, 0.1, 0.1, 0.1), rho = 0.1, tau_e = 0.1,
                           tau_g = 0.1, tau_f = 0.1,
