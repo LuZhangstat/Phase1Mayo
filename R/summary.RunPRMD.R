@@ -71,7 +71,7 @@ print.summary.RunPRMD <- function(x, ...){
   #' @param x summary.RunPRMD object to summarise
   #' @param ... other arguments ignored (for compatibility with generic)
   #'
-  #' @import RColorBrewer
+  #' @importFrom RColorBrewer brewer.pal
   #' @importFrom dplyr mutate rowwise mutate_at starts_with select funs vars
   #' @import kableExtra
   #' @import knitr
