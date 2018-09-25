@@ -157,6 +157,7 @@ plot.RunPRMD <- function(x, ..., select_cycle = x$cycles){
   #'
   #' @export
 
+  dose <- NA; cycle <- NA; nTTP <- NA; effcy <- NA
   thislist <- list(...)
   Max.nTTP <- max(x$patlist$nTTP)
   select.index <- sapply(x$patlist$cycle, function(a){any(a == select_cycle)})
@@ -164,8 +165,8 @@ plot.RunPRMD <- function(x, ..., select_cycle = x$cycles){
     nTTP = as.vector(x$patlist$nTTP[select.index]),
     cycle = factor(x$patlist$cycle[select.index], levels = select_cycle),
     dose = factor(x$patlist$dose[select.index], levels = x$doses))
-  pnTTP <- ggplot(data = nttp.dt, aes(x = nttp.dt$dose, y = nttp.dt$nTTP,
-                                      fill = nttp.dt$cycle)) +
+  pnTTP <- ggplot(data = nttp.dt, aes(x = dose, y = nTTP,
+                                      fill = cycle)) +
     stat_boxplot(geom ='errorbar', width = 0.5) + geom_boxplot() +
     facet_wrap(~cycle) + xlab("Doses") + ylab("nTTP")
     scale_x_discrete(breaks = x$doses, labels = x$doses)
@@ -176,8 +177,8 @@ plot.RunPRMD <- function(x, ..., select_cycle = x$cycles){
       effcy = as.vector(x$patlist$efficacy[select.index]),
       cycle = factor(x$patlist$cycle[select.index], levels = select_cycle),
       dose = factor(x$patlist$dose[select.index], levels = x$doses))
-    peff <- ggplot(data = effcy.dt, aes(x = effcy.dt$dose, y = effcy.dt$effcy,
-                                        fill = effcy.dt$cycle)) +
+    peff <- ggplot(data = effcy.dt, aes(x = dose, y = effcy,
+                                        fill = cycle)) +
       stat_boxplot(geom ='errorbar', width = 0.5) + geom_boxplot() +
       facet_wrap(~cycle) + xlab("Doses") + ylab("Efficacy")
       scale_x_discrete(breaks = x$doses, labels = x$doses)
