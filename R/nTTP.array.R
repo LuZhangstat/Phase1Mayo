@@ -25,9 +25,6 @@ nTTP.array <- function(wm, toxmax) {
   #'
   #' nTTP.array(wm, toxmax)
   #'
-  #' \dontrun{
-  #' nTTP.array(wm = NULL, toxmax = NULL)
-  #' }
   #' @importFrom arrayhelpers vec2array
   #' @export
 

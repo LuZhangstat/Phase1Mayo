@@ -199,7 +199,7 @@ SimPRMD <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
   #'
   #'
   #' @examples
-  #'
+  #' \donttest{
   #' data("prob")      # load prob.RData from package phaseI, Details see "?prob"
   #' data("eff")       # load eff.RData from package phaseI. Details see "?eff"
   #'
@@ -218,25 +218,23 @@ SimPRMD <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
   #'
   #'
   #' #------- a flat dose-toxicity, dose-efficacy, cycle-efficacy pattern------#
-  #' # simul1 <- SimPRMD(numTrials = 1, tox.matrix = tox.matrix,
-  #' #                   eff.structure = eff.structure, eff.Sigma = eff.Sigma,
-  #' #                   eff.sd_trans = eff.sd_trans, wm = wm, toxmax = toxmax,
-  #' #                   trialSize = 36)
+  #' simul1 <- SimPRMD(numTrials = 1, tox.matrix = tox.matrix,
+  #'                   eff.structure = eff.structure, eff.Sigma = eff.Sigma,
+  #'                   eff.sd_trans = eff.sd_trans, wm = wm, toxmax = toxmax,
+  #'                   trialSize = 36)
   #'
   #' #------- a flat dose-toxicity pattern model ------#
-  #' # simul2 <- SimPRMD(numTrials = 1, toxtype = c("H", "L", "M"),
-  #' #                   intercept.alpha = c(1.9, 2.3, 2.6, 3.1),
-  #' #                   coef.beta = c(-0.3, -0.2, -0.25),
-  #' #                   cycle.gamma = 0, tox.target = 0.23,
-  #' #                   thrd1 = 0.23, thrd2 = 0.23, p_tox1 = 0.2, p_tox2 = 0.2,
-  #' #                   ICD.flag = FALSE, IED.flag = FALSE, effcy.flag = TRUE)
+  #' simul2 <- SimPRMD(numTrials = 1, toxtype = c("H", "L", "M"),
+  #'                   intercept.alpha = c(1.9, 2.3, 2.6, 3.1),
+  #'                   coef.beta = c(-0.3, -0.2, -0.25),
+  #'                   cycle.gamma = 0, tox.target = 0.23,
+  #'                   thrd1 = 0.23, thrd2 = 0.23, p_tox1 = 0.2, p_tox2 = 0.2,
+  #'                   ICD.flag = FALSE, IED.flag = FALSE, effcy.flag = TRUE)
   #'
-  #' # summary(simul2)
-  #' # plot(simul2)
-  #'
-  #' \dontrun{
-  #'
+  #' summary(simul2)
+  #' plot(simul2)
   #' }
+  #'
   #'
   #' @import rjags
   #' @import coda

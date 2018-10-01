@@ -184,9 +184,8 @@ plot.SimPRMD <- function(x, ..., title.add = TRUE){
 
   ## calculate the posterior probability of nttp < target
 
-
   cycle <- NA; dose <- NA; ppnttp.d <- NA; q.2.5 <- NA; q.97.5 <- NA
-  perc <- NA; surv_dur <- NA
+  perc <- NA; surv_dur <- NA; nttp.c <- NA
 
   dose_A_V <- unlist(sapply(x$list_simul, function(a){a$doseA}))
   n.doses <- length(x$doses)

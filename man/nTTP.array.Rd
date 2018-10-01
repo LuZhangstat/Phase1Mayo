@@ -33,7 +33,4 @@ toxmax = 2.5
 
 nTTP.array(wm, toxmax)
 
-\dontrun{
-nTTP.array(wm = NULL, toxmax = NULL)
-}
 }
