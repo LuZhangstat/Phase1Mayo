@@ -12,8 +12,8 @@ Description:  Implements Bayesian phase I repeated measurement design that
     or without individualized dose modification, 3-stage models with or without
     individualized dose modification, etc. Functions are provided to recommend 
     dosage selection based on the data collected in the available patient cohorts 
-    and to simulate trial characteristics given design parameters. 
-    Yin, Jun, et al. (2017) <doi:10.1002/sim.7134>
+    and to simulate trial characteristics given design parameters. Yin, Jun, et al. 
+    (2017) <doi:10.1002/sim.7134>
 SystemRequirements: JAGS(http://mcmc-jags.sourceforge.net)
 Depends: 
     R (>= 3.2.3),
