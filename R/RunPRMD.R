@@ -174,7 +174,7 @@ RunPRMD <-function(seed = 1234, patlist, patID_act = NULL,
   #'}
   #'
   #'
-  #' @import rjags
+  ## @import rjags
   #' @import coda
   #' @importFrom arrayhelpers vec2array
   #' @importFrom phase1RMD GenToxProb

@@ -236,7 +236,7 @@ SimPRMD <-function(seed = 1234, numTrials = 100, doses = 1:6, cycles = 1:6,
   #' }
   #'
   #'
-  #' @import rjags
+  ## @import rjags
   #' @import coda
   #' @importFrom arrayhelpers vec2array
   #' @importFrom phase1RMD GenToxProb
