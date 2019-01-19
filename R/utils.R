@@ -126,7 +126,6 @@ phase1stage1 <- function(patlist, ctrl_param, n.iters = 5000, burn.in = 5000,
   ## n.chains:       number of MCMC chains in the fitting, default = 1
   ## dose_flag:      when dose_flag equals 1, we need to degenerate design matrix
   ## return: return the posterior samples of the MCMC chain
-  ## @import R2WinBUGS
   #' @importFrom rjags jags.model jags.samples
   #' @importFrom stats runif update
   #' @importFrom utils modifyList
@@ -229,7 +228,6 @@ phase1stage2 <- function(patlist, ctrl_param, n.iters = 5000, burn.in = 5000,
   ## n.chains:       number of MCMC chains in the fitting, default is 1
   ## dose_flag:      when dose_flag equals 1, we need to degenerate design matrix
   ## return:         return the posterior samples of the MCMC chain
-  ## @import R2WinBUGS
   #' @importFrom rjags jags.model jags.samples
   #' @importFrom stats runif update
   #' @importFrom utils modifyList
