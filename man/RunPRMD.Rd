@@ -169,7 +169,6 @@ The RunPRMD function implement a Multi-Stage Phase I Dose--Finding
   \code{\link{SimPRMD}}.
 }
 \examples{
-\donttest{
 data("patlist_sim")
 # check the whole dataset by function patlist.display
 patlist.display(patlist_sim, n.dose = 6, n.cycle = 6)
@@ -191,6 +190,7 @@ cycle_act <- c(5, 5, 5, 4, 4, 4, 3, 3, 2, 2, 2, 1, 1 ,1)
 dose_act <- c(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4)
 dlt_act <- c(0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0)
 
+\donttest{
 test <- RunPRMD(patlist = patlist, patID_act = patID_act,
                 cycle_act = cycle_act, dose_act = dose_act,
                 dlt_act = dlt_act, trialSize = 36, chSize = 3,
@@ -201,6 +201,5 @@ summary(test)
 plot(test)
 plot(test, select_cycle = 1:2)
 }
-
 
 }
