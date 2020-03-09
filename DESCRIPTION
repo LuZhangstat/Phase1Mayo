@@ -1,8 +1,8 @@
 Package: phase1PRMD
 Type: Package
-Date: 2019-01-29
+Date: 2020-03-08
 Title: Personalized Repeated Measurement Design for Phase I Clinical Trials
-Version: 1.0.1
+Version: 1.0.2
 Author: Lu Zhang, Jun Yin
 Maintainer: Lu Zhang <luzhangstat@gmail.com>
 Description: Implements Bayesian phase I repeated measurement design that 
