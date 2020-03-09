@@ -252,12 +252,12 @@ plot.SimPRMD <- function(x, ..., title.add = TRUE){
 
   tgc <- summarySE(m.nttp.dt, measurevar="m.nttp", groupvars=c("group","dose"))
   pd <- position_dodge(0.4)
-  p1 <- ggplot(tgc, aes(x = dose, y = m.nttp, group = group,
-                        colour = group)) +
+  p1 <- ggplot(tgc, aes(x = dose, y = tgc$m.nttp, group = tgc$group,
+                        colour = tgc$group)) +
     geom_errorbar(aes(ymin=q.2.5, ymax=q.97.5), width=.4,
                   position=pd) +
-    geom_line(position=pd, aes(linetype = group)) +
-    geom_point(position=pd, aes(shape = group), size = 3, fill = "white") +
+    geom_line(position=pd, aes(linetype = tgc$group)) +
+    geom_point(position=pd, aes(shape = tgc$group), size = 3, fill = "white") +
     scale_y_continuous(limits = c(0.0, 0.85))
 
   if(title.add == T){
